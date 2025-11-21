@@ -7,6 +7,7 @@ import {
 } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import { getProductByEAN } from "../../../lib/api/products";
+import { getOpenPetFoodFactsProductByEAN } from "../../../lib/api/external/openpetfoodfacts";
 import type { Product } from "../../../types/product";
 
 export default function Scan() {
@@ -14,6 +15,7 @@ export default function Scan() {
   const [scannedCode, setScannedCode] = useState<string | null>(null);
   const [product, setProduct] = useState<Product | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [source, setSource] = useState<"db" | "openpetfoodfacts" | null>(null);
   const isScanningRef = useRef(false);
 
   const reset = useCallback(() => {
@@ -21,6 +23,7 @@ export default function Scan() {
     setScannedCode(null);
     setProduct(null);
     setError(null);
+    setSource(null);
   }, []);
 
   const onBarcodeScanned = useCallback(async (scan: BarcodeScanningResult) => {
@@ -41,9 +44,18 @@ export default function Scan() {
       const found = await getProductByEAN(code);
       if (found) {
         setProduct(found);
+        setSource("db");
       } else {
-        setProduct(null);
-        setError("Produit non disponible en base de données");
+        // Fallback to OpenPetFoodFacts
+        const ext = await getOpenPetFoodFactsProductByEAN(code);
+        if (ext) {
+          setProduct(ext);
+          setSource("openpetfoodfacts");
+        } else {
+          setProduct(null);
+          setSource(null);
+          setError("Produit non disponible en base de données");
+        }
       }
     } catch (e) {
       setProduct(null);
@@ -100,6 +112,11 @@ export default function Scan() {
             <Text style={styles.productCode}>
               Code barre: {product.code_ean}
             </Text>
+            {source === "openpetfoodfacts" && (
+              <Text style={styles.note}>
+                (produit trouvé dans openpetfoodfacts)
+              </Text>
+            )}
           </View>
         )}
 
@@ -169,6 +186,7 @@ const styles = StyleSheet.create({
   code: { color: "#333" },
   error: { color: "#B00020", fontWeight: "600" },
   hint: { textAlign: "center", color: "#666" },
+  note: { color: "#666", fontStyle: "italic" },
   center: {
     flex: 1,
     alignItems: "center",
