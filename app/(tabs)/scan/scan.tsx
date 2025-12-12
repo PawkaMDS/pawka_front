@@ -1,32 +1,28 @@
 import { useCallback, useRef, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ScrollView,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
   CameraView,
   useCameraPermissions,
   BarcodeScanningResult,
 } from "expo-camera";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
 import { scanProductByEAN } from "@/lib/api/scan";
-import type { Product } from "@/types/product";
-import { ProductScanResult } from "@/components/ProductScanResult";
+import { ProductBottomSheet } from "@/components/ProductBottomSheet";
 
 export default function Scan() {
   const [permission, requestPermission] = useCameraPermissions();
   const [scannedCode, setScannedCode] = useState<string | null>(null);
-  const [product, setProduct] = useState<Product | null>(null);
+  const [productId, setProductId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const isScanningRef = useRef(false);
+
+  const token = "jwttoken";
 
   const reset = useCallback(() => {
     isScanningRef.current = false;
     setScannedCode(null);
-    setProduct(null);
+    setProductId(null);
     setError(null);
   }, []);
 
@@ -57,14 +53,15 @@ export default function Scan() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
 
       const result = await scanProductByEAN(code);
-      if (result) {
-        setProduct(result);
+      if (result && result.id) {
+        // Afficher le bottom sheet avec le produit
+        setProductId(result.id);
       } else {
-        setProduct(null);
+        setProductId(null);
         setError("Produit non disponible en base de données");
       }
     } catch (e) {
-      setProduct(null);
+      setProductId(null);
       const message = e instanceof Error ? e.message : String(e);
       setError(`Erreur lors de la récupération du produit: ${message}`);
     }
@@ -93,8 +90,8 @@ export default function Scan() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.cameraWrapper}>
+    <GestureHandlerRootView style={styles.container}>
+      <View style={styles.cameraContainer}>
         <CameraView
           style={StyleSheet.absoluteFill}
           facing="back"
@@ -105,91 +102,157 @@ export default function Scan() {
         />
 
         <View style={styles.overlay} pointerEvents="none">
-          <View style={styles.guide} />
+          <View style={styles.scanFrame}>
+            <View style={[styles.corner, styles.cornerTopLeft]} />
+            <View style={[styles.corner, styles.cornerTopRight]} />
+            <View style={[styles.corner, styles.cornerBottomLeft]} />
+            <View style={[styles.corner, styles.cornerBottomRight]} />
+          </View>
         </View>
-      </View>
 
-      <View style={styles.panel}>
-        {scannedCode && (
-          <Text style={styles.code}>EAN scanné: {scannedCode}</Text>
+        {!productId && !error && (
+          <View style={styles.hintContainer}>
+            <Text style={styles.hint}>Scannez le code-barres d'un produit</Text>
+          </View>
         )}
 
-        {product && (
-          <ScrollView style={styles.resultScroll}>
-            <ProductScanResult product={product} />
-          </ScrollView>
-        )}
-
-        {error && <Text style={styles.error}>{error}</Text>}
-
-        {(product || error) && (
-          <TouchableOpacity
-            style={[styles.button, styles.secondary]}
-            onPress={reset}
-          >
-            <Text style={[styles.buttonText, styles.secondaryText]}>
-              Scanner à nouveau
-            </Text>
-          </TouchableOpacity>
-        )}
-
-        {!product && !error && (
-          <Text style={styles.hint}>
-            Cadrez le code-barres EAN dans le carré
-          </Text>
+        {error && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+            <TouchableOpacity style={styles.retryButton} onPress={reset}>
+              <Text style={styles.retryButtonText}>Réessayer</Text>
+            </TouchableOpacity>
+          </View>
         )}
       </View>
-    </View>
+
+      {productId && (
+        <ProductBottomSheet
+          productId={productId}
+          token={token}
+          onClose={reset}
+        />
+      )}
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#000" },
-  cameraWrapper: { flex: 2, backgroundColor: "#000" },
+  container: {
+    flex: 1,
+    backgroundColor: "#000",
+  },
+  cameraContainer: {
+    flex: 1,
+    backgroundColor: "#000",
+  },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "center",
   },
-  guide: {
-    width: "70%",
-    aspectRatio: 1,
-    borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.8)",
+  scanFrame: {
+    width: "80%",
+    aspectRatio: 1.5, // Rectangle plus large que haut (adapté aux codes-barres)
+    position: "relative",
+  },
+  corner: {
+    position: "absolute",
+    width: 30,
+    height: 30,
+    borderColor: "rgba(255,255,255,0.9)",
+  },
+  cornerTopLeft: {
+    top: 0,
+    left: 0,
+    borderTopWidth: 4,
+    borderLeftWidth: 4,
+  },
+  cornerTopRight: {
+    top: 0,
+    right: 0,
+    borderTopWidth: 4,
+    borderRightWidth: 4,
+  },
+  cornerBottomLeft: {
+    bottom: 0,
+    left: 0,
+    borderBottomWidth: 4,
+    borderLeftWidth: 4,
+  },
+  cornerBottomRight: {
+    bottom: 0,
+    right: 0,
+    borderBottomWidth: 4,
+    borderRightWidth: 4,
+  },
+  hintContainer: {
+    position: "absolute",
+    bottom: 40,
+    left: 20,
+    right: 20,
+    backgroundColor: "rgba(0,0,0,0.7)",
+    padding: 16,
     borderRadius: 12,
   },
-  panel: { flex: 1, backgroundColor: "#fff", padding: 16, gap: 12 },
+  hint: {
+    textAlign: "center",
+    color: "#fff",
+    fontSize: 14,
+  },
+  errorContainer: {
+    position: "absolute",
+    bottom: 40,
+    left: 20,
+    right: 20,
+    backgroundColor: "rgba(211, 47, 47, 0.9)",
+    padding: 16,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  errorText: {
+    color: "#fff",
+    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 12,
+  },
+  retryButton: {
+    backgroundColor: "#fff",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: "#D32F2F",
+    fontWeight: "600",
+  },
+  center: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 16,
+    backgroundColor: "#fff",
+  },
   title: {
     fontSize: 20,
     fontWeight: "600",
     marginBottom: 8,
     textAlign: "center",
   },
-  subtitle: { textAlign: "center", color: "#444", marginBottom: 16 },
+  subtitle: {
+    textAlign: "center",
+    color: "#444",
+    marginBottom: 16,
+  },
   button: {
     backgroundColor: "#0A7EA4",
-    paddingHorizontal: 16,
+    paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 10,
-    alignSelf: "center",
   },
-  buttonText: { color: "white", fontWeight: "600" },
-  secondary: {
-    backgroundColor: "transparent",
-    borderWidth: 1,
-    borderColor: "#0A7EA4",
-  },
-  secondaryText: { color: "#0A7EA4" },
-  resultScroll: {
-    flex: 1,
-  },
-  code: { color: "#333" },
-  error: { color: "#B00020", fontWeight: "600" },
-  hint: { textAlign: "center", color: "#666" },
-  center: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 16,
+  buttonText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 16,
   },
 });
