@@ -4,7 +4,7 @@ export const getApiBaseUrl = (): string => {
   const envUrl = process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, '');
   if (envUrl) return envUrl;
 
-  return 'http://s44so40g44soo0oosoc8k048.37.59.98.93.sslip.io:8081';
+  return 'ipv4_back';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
