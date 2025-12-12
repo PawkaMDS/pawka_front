@@ -38,6 +38,13 @@ export default function TabsLayout() {
       />
 
       <Tabs.Screen
+        name="scan/_result"
+        options={{
+          href: null,
+        }}
+      />
+
+      <Tabs.Screen
         name="recommendation"
         options={{
           title: "Recommandation",
