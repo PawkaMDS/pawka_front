@@ -1,21 +1,26 @@
 import { useCallback, useRef, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ScrollView,
+} from "react-native";
 import {
   CameraView,
   useCameraPermissions,
   BarcodeScanningResult,
 } from "expo-camera";
 import * as Haptics from "expo-haptics";
-import { getProductByEAN } from "../../../lib/api/products";
-import { getOpenPetFoodFactsProductByEAN } from "../../../lib/api/external/openpetfoodfacts";
-import type { Product } from "../../../types/product";
+import { scanProductByEAN } from "@/lib/api/scan";
+import type { Product } from "@/types/product";
+import { ProductScanResult } from "@/components/ProductScanResult";
 
 export default function Scan() {
   const [permission, requestPermission] = useCameraPermissions();
   const [scannedCode, setScannedCode] = useState<string | null>(null);
   const [product, setProduct] = useState<Product | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [source, setSource] = useState<"db" | "openpetfoodfacts" | null>(null);
   const isScanningRef = useRef(false);
 
   const reset = useCallback(() => {
@@ -23,7 +28,6 @@ export default function Scan() {
     setScannedCode(null);
     setProduct(null);
     setError(null);
-    setSource(null);
   }, []);
 
   const onBarcodeScanned = useCallback(async (scan: BarcodeScanningResult) => {
@@ -31,8 +35,19 @@ export default function Scan() {
 
     const code = scan.data?.trim();
     const type = scan.type?.toLowerCase?.() ?? "";
-    const isEAN13 = type.includes("ean13") || type.includes("ean-13");
-    if (!code || !isEAN13) return;
+
+    // Accepter EAN-13, EAN-8, UPC-A et UPC-E
+    const isValidBarcode =
+      type.includes("ean13") ||
+      type.includes("ean-13") ||
+      type.includes("ean8") ||
+      type.includes("ean-8") ||
+      type.includes("upc_a") ||
+      type.includes("upc-a") ||
+      type.includes("upc_e") ||
+      type.includes("upc-e");
+
+    if (!code || !isValidBarcode) return;
 
     isScanningRef.current = true;
     setScannedCode(code);
@@ -41,21 +56,12 @@ export default function Scan() {
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
 
-      const found = await getProductByEAN(code);
-      if (found) {
-        setProduct(found);
-        setSource("db");
+      const result = await scanProductByEAN(code);
+      if (result) {
+        setProduct(result);
       } else {
-        // Fallback to OpenPetFoodFacts
-        const ext = await getOpenPetFoodFactsProductByEAN(code);
-        if (ext) {
-          setProduct(ext);
-          setSource("openpetfoodfacts");
-        } else {
-          setProduct(null);
-          setSource(null);
-          setError("Produit non disponible en base de données");
-        }
+        setProduct(null);
+        setError("Produit non disponible en base de données");
       }
     } catch (e) {
       setProduct(null);
@@ -92,7 +98,9 @@ export default function Scan() {
         <CameraView
           style={StyleSheet.absoluteFill}
           facing="back"
-          barcodeScannerSettings={{ barcodeTypes: ["ean13"] }}
+          barcodeScannerSettings={{
+            barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"],
+          }}
           onBarcodeScanned={onBarcodeScanned}
         />
 
@@ -107,17 +115,9 @@ export default function Scan() {
         )}
 
         {product && (
-          <View style={styles.result}>
-            <Text style={styles.productName}>{product.name}</Text>
-            <Text style={styles.productCode}>
-              Code barre: {product.code_ean}
-            </Text>
-            {source === "openpetfoodfacts" && (
-              <Text style={styles.note}>
-                (produit trouvé dans openpetfoodfacts)
-              </Text>
-            )}
-          </View>
+          <ScrollView style={styles.resultScroll}>
+            <ProductScanResult product={product} />
+          </ScrollView>
         )}
 
         {error && <Text style={styles.error}>{error}</Text>}
@@ -180,13 +180,12 @@ const styles = StyleSheet.create({
     borderColor: "#0A7EA4",
   },
   secondaryText: { color: "#0A7EA4" },
-  result: { gap: 6 },
-  productName: { fontSize: 18, fontWeight: "700" },
-  productCode: { color: "#333" },
+  resultScroll: {
+    flex: 1,
+  },
   code: { color: "#333" },
   error: { color: "#B00020", fontWeight: "600" },
   hint: { textAlign: "center", color: "#666" },
-  note: { color: "#666", fontStyle: "italic" },
   center: {
     flex: 1,
     alignItems: "center",
