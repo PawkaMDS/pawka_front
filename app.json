@@ -38,6 +38,13 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Nous avons besoin d'accéder à votre caméra pour scanner des codes-barres.",
+          "microphonePermission": "Nous avons besoin d'accéder au microphone si l'enregistrement vidéo est utilisé."
+        }
       ]
     ],
     "experiments": {
