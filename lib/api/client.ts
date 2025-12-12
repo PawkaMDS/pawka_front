@@ -4,7 +4,7 @@ export const getApiBaseUrl = (): string => {
   const envUrl = process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, '');
   if (envUrl) return envUrl;
 
-  return 'http://10.25.128.33:8081';
+  return 'http://s44so40g44soo0oosoc8k048.37.59.98.93.sslip.io:8081';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
