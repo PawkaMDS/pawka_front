@@ -24,15 +24,33 @@ const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const PEEK_HEIGHT = 200;
 const MAX_TRANSLATE = SCREEN_HEIGHT * 0.9;
 
+const getAnimalIcon = (product: DetailedProduct): string => {
+  const animalTypeCode = product.product_foods?.[0]?.animal_type?.code;
+
+  switch (animalTypeCode) {
+    case "cat":
+      return "paw-outline";
+    case "dog":
+      return "paw";
+    case "bird":
+      return "leaf-outline";
+    case "fish":
+      return "water-outline";
+    case "rodent":
+    case "rabbit":
+      return "paw-outline";
+    default:
+      return "fast-food-outline";
+  }
+};
+
 interface ProductBottomSheetProps {
   productId: number;
-  token: string;
   onClose: () => void;
 }
 
 export function ProductBottomSheet({
   productId,
-  token,
   onClose,
 }: ProductBottomSheetProps) {
   const [product, setProduct] = useState<DetailedProduct | null>(null);
@@ -45,7 +63,7 @@ export function ProductBottomSheet({
   useEffect(() => {
     const loadProduct = async () => {
       try {
-        const data = await getProductById(productId, token);
+        const data = await getProductById(productId);
         if (data) {
           setProduct(data);
         } else {
@@ -60,7 +78,7 @@ export function ProductBottomSheet({
     };
 
     loadProduct();
-  }, [productId, token]);
+  }, [productId]);
 
   const scrollTo = (destination: number) => {
     "worklet";
@@ -78,7 +96,6 @@ export function ProductBottomSheet({
     })
     .onUpdate((event) => {
       const newY = context.value.y + event.translationY;
-      // Limiter le déplacement
       if (newY >= SCREEN_HEIGHT - MAX_TRANSLATE && newY <= SCREEN_HEIGHT) {
         translateY.value = newY;
       }
@@ -162,7 +179,7 @@ export function ProductBottomSheet({
                       style={[styles.peekImage, styles.peekImagePlaceholder]}
                     >
                       <Ionicons
-                        name="fast-food-outline"
+                        name={getAnimalIcon(product) as any}
                         size={40}
                         color="#CCC"
                       />
