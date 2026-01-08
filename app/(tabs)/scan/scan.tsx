@@ -1,5 +1,11 @@
 import { useCallback, useRef, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+} from "react-native";
 import {
   CameraView,
   useCameraPermissions,
@@ -15,20 +21,20 @@ export default function Scan() {
   const [scannedCode, setScannedCode] = useState<string | null>(null);
   const [productId, setProductId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const isScanningRef = useRef(false);
-
-  const token = "jwttoken";
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>("");
+  const lastScannedCodeRef = useRef<string | null>(null);
 
   const reset = useCallback(() => {
-    isScanningRef.current = false;
+    lastScannedCodeRef.current = null;
     setScannedCode(null);
     setProductId(null);
     setError(null);
+    setIsLoading(false);
+    setLoadingMessage("");
   }, []);
 
   const onBarcodeScanned = useCallback(async (scan: BarcodeScanningResult) => {
-    if (isScanningRef.current) return;
-
     const code = scan.data?.trim();
     const type = scan.type?.toLowerCase?.() ?? "";
 
@@ -45,25 +51,35 @@ export default function Scan() {
 
     if (!code || !isValidBarcode) return;
 
-    isScanningRef.current = true;
+    // Empêcher de rescanner le même code
+    if (lastScannedCodeRef.current === code) return;
+
+    lastScannedCodeRef.current = code;
     setScannedCode(code);
     setError(null);
+    setIsLoading(true);
+    setLoadingMessage("Analyse du code-barres en cours...");
 
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
 
       const result = await scanProductByEAN(code);
+
+      setIsLoading(false);
+
       if (result && result.id) {
-        // Afficher le bottom sheet avec le produit
         setProductId(result.id);
       } else {
         setProductId(null);
-        setError("Produit non disponible en base de données");
+        setError(
+          "Produit non trouvé. Veuillez réessayer avec un autre code-barres."
+        );
       }
     } catch (e) {
+      setIsLoading(false);
       setProductId(null);
       const message = e instanceof Error ? e.message : String(e);
-      setError(`Erreur lors de la récupération du produit: ${message}`);
+      setError(`Erreur lors de l'analyse: ${message}`);
     }
   }, []);
 
@@ -110,13 +126,23 @@ export default function Scan() {
           </View>
         </View>
 
-        {!productId && !error && (
+        {!productId && !error && !isLoading && (
           <View style={styles.hintContainer}>
             <Text style={styles.hint}>Scannez le code-barres d'un produit</Text>
           </View>
         )}
 
-        {error && (
+        {isLoading && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#fff" />
+            <Text style={styles.loadingText}>{loadingMessage}</Text>
+            <Text style={styles.loadingSubtext}>
+              Cela peut prendre quelques secondes...
+            </Text>
+          </View>
+        )}
+
+        {error && !isLoading && (
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>{error}</Text>
             <TouchableOpacity style={styles.retryButton} onPress={reset}>
@@ -127,11 +153,7 @@ export default function Scan() {
       </View>
 
       {productId && (
-        <ProductBottomSheet
-          productId={productId}
-          token={token}
-          onClose={reset}
-        />
+        <ProductBottomSheet productId={productId} onClose={reset} />
       )}
     </GestureHandlerRootView>
   );
@@ -199,6 +221,29 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#fff",
     fontSize: 14,
+  },
+  loadingContainer: {
+    position: "absolute",
+    bottom: 40,
+    left: 20,
+    right: 20,
+    backgroundColor: "rgba(0, 122, 255, 0.95)",
+    padding: 24,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  loadingText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
+    marginTop: 16,
+  },
+  loadingSubtext: {
+    color: "rgba(255, 255, 255, 0.8)",
+    fontSize: 13,
+    textAlign: "center",
+    marginTop: 8,
   },
   errorContainer: {
     position: "absolute",
