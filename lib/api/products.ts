@@ -18,13 +18,10 @@ export async function getProductByEAN(ean: string): Promise<Product | null> {
   }
 }
 
-export async function getProductById(id: number, token: string): Promise<DetailedProduct | null> {
+export async function getProductById(id: number): Promise<DetailedProduct | null> {
   try {
-    const res = await api.get<DetailedProduct>(`/api/products/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    // Le token est automatiquement ajouté par l'intercepteur
+    const res = await api.get<DetailedProduct>(`/api/products/${id}`);
     return res.data;
   } catch (err) {
     if (axios.isAxiosError(err)) {
