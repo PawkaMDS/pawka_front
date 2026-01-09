@@ -1,11 +1,11 @@
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
   Alert,
 } from "react-native";
+import { Text } from "@/components/ui/Text";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useRouter } from "expo-router";
@@ -73,7 +73,7 @@ export default function Profil() {
 
           {user.is_premium && (
             <View style={styles.premiumBadge}>
-              <Text style={styles.premiumText}>⭐ Premium</Text>
+              <Text style={[styles.premiumText, { fontFamily: "NewZen-Medium" }]}>⭐ Premium</Text>
             </View>
           )}
         </View>

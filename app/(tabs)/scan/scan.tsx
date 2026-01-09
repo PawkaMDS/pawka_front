@@ -1,11 +1,11 @@
 import { useCallback, useRef, useState } from "react";
 import {
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
   ActivityIndicator,
 } from "react-native";
+import { Text } from "@/components/ui/Text";
 import {
   CameraView,
   useCameraPermissions,

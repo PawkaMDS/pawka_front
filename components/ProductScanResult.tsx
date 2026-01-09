@@ -1,5 +1,6 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, Image } from "react-native";
 import type { Product } from "@/types/product";
+import { Text } from "@/components/ui/Text";
 
 interface ProductScanResultProps {
   product: Product;
