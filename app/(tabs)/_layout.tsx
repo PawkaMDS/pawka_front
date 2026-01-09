@@ -1,19 +1,16 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { useColorScheme } from "react-native";
 import { Colors } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { HapticTab } from "@/components/haptic-tab";
 
 export default function TabsLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       initialRouteName="search"
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: Colors.light.primary.base,
         tabBarButton: HapticTab,
       }}
     >
