@@ -1,9 +1,13 @@
 import { Tabs } from "expo-router";
 import React from "react";
 import { Colors } from "@/constants/theme";
-import { IconSymbol } from "@/components/ui/icon-symbol";
 import { HapticTab } from "@/components/haptic-tab";
 import { FontFamilies } from "@/constants/typography";
+import UserIcon from "@/assets/icons/user.svg";
+import ScanIcon from "@/assets/icons/scan.svg";
+import HeartIcon from "@/assets/icons/heart.svg";
+import SearchIcon from "@/assets/icons/search.svg";
+import HistoryIcon from "@/assets/icons/history.svg";
 
 export default function TabsLayout() {
   return (
@@ -23,21 +27,11 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen
-        name="search"
-        options={{
-          title: "Recherche",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="magnifyingglass" color={color} />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
         name="scan/scan"
         options={{
           title: "Scan",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="qrcode.viewfinder" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <ScanIcon width={22} height={22} fill={color} />
           ),
         }}
       />
@@ -50,21 +44,31 @@ export default function TabsLayout() {
       />
 
       <Tabs.Screen
-        name="recommendation"
+        name="history"
         options={{
-          title: "Favoris",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="star.fill" color={color} />
+          title: "Historique",
+          tabBarIcon: ({ color, size }) => (
+            <HistoryIcon width={22} height={22} fill={color} />
           ),
         }}
       />
 
       <Tabs.Screen
-        name="history"
+        name="recommendation"
         options={{
-          title: "Historique",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="clock.fill" color={color} />
+          title: "Favoris",
+          tabBarIcon: ({ color, size }) => (
+            <HeartIcon width={22} height={22} fill={color} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="search"
+        options={{
+          title: "Recherche",
+          tabBarIcon: ({ color, size }) => (
+            <SearchIcon width={22} height={22} fill={color} />
           ),
         }}
       />
@@ -74,8 +78,8 @@ export default function TabsLayout() {
         options={{
           title: "Profil",
           tabBarLabel: "Profil",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="person.fill" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <UserIcon width={22} height={22} fill={color} />
           ),
         }}
       />
