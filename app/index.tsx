@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Platform,
+} from "react-native";
 import { Redirect } from "expo-router";
 import { login } from "@/lib/api/auth";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -23,14 +30,16 @@ export default function Index() {
         "Connexion réussie",
         `Bienvenue ${response.user.name} !\n${
           response.user.is_premium ? "⭐ Compte Premium" : "📱 Compte Standard"
-        }`
+        }`,
+        [{ text: "OK", onPress: () => setIsLoggedIn(true) }],
+        { cancelable: false }
       );
-      setIsLoggedIn(true);
     } catch (error) {
       console.error("Login error:", error);
       Alert.alert(
         "Erreur de connexion",
-        error instanceof Error ? error.message : "Une erreur est survenue"
+        error instanceof Error ? error.message : "Une erreur est survenue",
+        [{ text: "OK" }]
       );
     } finally {
       setLoading(false);
