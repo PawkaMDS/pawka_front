@@ -18,6 +18,7 @@ export default function TabsLayout() {
         tabBarLabelStyle: {
           fontFamily: FontFamilies.text.bold,
           fontSize: 12,
+          textAlign: "center",
         },
       }}
     >
