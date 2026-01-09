@@ -41,6 +41,12 @@ export default function Profil() {
       <SafeAreaView style={styles.container}>
         <Text style={styles.title}>Non connecté</Text>
         <Text style={styles.subtitle}>Veuillez vous connecter</Text>
+        <TouchableOpacity
+          style={styles.loginButton}
+          onPress={() => router.push("/")}
+        >
+          <Text style={styles.loginButtonText}>Se connecter</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     );
   }
@@ -202,6 +208,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoutButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  loginButton: {
+    backgroundColor: "#007AFF",
+    marginTop: 20,
+    marginHorizontal: 20,
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  loginButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
