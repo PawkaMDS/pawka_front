@@ -3,6 +3,7 @@ import React from "react";
 import { Colors } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { HapticTab } from "@/components/haptic-tab";
+import { FontFamilies } from "@/constants/typography";
 
 export default function TabsLayout() {
   return (
@@ -11,7 +12,13 @@ export default function TabsLayout() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: Colors.light.primary.base,
+        tabBarInactiveTintColor: Colors.light.greyscale[60],
         tabBarButton: HapticTab,
+
+        tabBarLabelStyle: {
+          fontFamily: FontFamilies.text.bold,
+          fontSize: 12,
+        },
       }}
     >
       <Tabs.Screen
@@ -44,7 +51,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="recommendation"
         options={{
-          title: "Recommandation",
+          title: "Favoris",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="star.fill" color={color} />
           ),
