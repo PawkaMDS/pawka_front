@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { Text } from "@/components/ui/Text";
 import { Redirect } from "expo-router";
 import { login } from "@/lib/api/auth";
 import { useAuth } from "@/lib/auth/AuthContext";

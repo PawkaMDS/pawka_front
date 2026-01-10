@@ -1,38 +1,25 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { useColorScheme } from "react-native";
-import { Colors } from "@/constants/theme";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { HapticTab } from "@/components/haptic-tab";
+import UserIcon from "@/assets/icons/user.svg";
+import ScanIcon from "@/assets/icons/scan.svg";
+import HeartIcon from "@/assets/icons/heart.svg";
+import SearchIcon from "@/assets/icons/search.svg";
+import HistoryIcon from "@/assets/icons/history.svg";
+import { PawkaTabBar } from "@/components/navigation/PawkaTabBar";
 
 export default function TabsLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       initialRouteName="search"
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        tabBarButton: HapticTab,
-      }}
+      screenOptions={{ headerShown: false }}
+      tabBar={(props) => <PawkaTabBar {...props} />}
     >
-      <Tabs.Screen
-        name="search"
-        options={{
-          title: "Recherche",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="magnifyingglass" color={color} />
-          ),
-        }}
-      />
-
       <Tabs.Screen
         name="scan/scan"
         options={{
           title: "Scan",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="qrcode.viewfinder" color={color} />
+            <ScanIcon width={22} height={22} fill={color} />
           ),
         }}
       />
@@ -45,21 +32,31 @@ export default function TabsLayout() {
       />
 
       <Tabs.Screen
-        name="recommendation"
+        name="history"
         options={{
-          title: "Recommandation",
+          title: "Historique",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="star.fill" color={color} />
+            <HistoryIcon width={22} height={22} fill={color} />
           ),
         }}
       />
 
       <Tabs.Screen
-        name="history"
+        name="recommendation"
         options={{
-          title: "Historique",
+          title: "Favoris",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="clock.fill" color={color} />
+            <HeartIcon width={22} height={22} fill={color} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="search"
+        options={{
+          title: "Recherche",
+          tabBarIcon: ({ color }) => (
+            <SearchIcon width={22} height={22} fill={color} />
           ),
         }}
       />
@@ -68,9 +65,8 @@ export default function TabsLayout() {
         name="user/profile"
         options={{
           title: "Profil",
-          tabBarLabel: "Profil",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="person.fill" color={color} />
+            <UserIcon width={22} height={22} fill={color} />
           ),
         }}
       />

@@ -1,14 +1,17 @@
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
   Alert,
 } from "react-native";
+import { Text } from "@/components/ui/Text";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useRouter } from "expo-router";
+import { Button } from "@/components/ui/Button";
+import UserIcon from "@/assets/icons/user.svg";
+import { Colors } from "@/constants/theme";
 
 export default function Profil() {
   const { user, isLoading, logout } = useAuth();
@@ -73,7 +76,7 @@ export default function Profil() {
 
           {user.is_premium && (
             <View style={styles.premiumBadge}>
-              <Text style={styles.premiumText}>⭐ Premium</Text>
+              <Text style={[styles.premiumText, { fontFamily: "NewZen-Medium" }]}>⭐ Premium</Text>
             </View>
           )}
         </View>
@@ -99,9 +102,15 @@ export default function Profil() {
           )}
         </View>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>Se déconnecter</Text>
-        </TouchableOpacity>
+        <Button
+          label="Se déconnecter"
+          variant="secondary"
+          fullWidth
+          icon={<UserIcon width={20} height={20} fill={Colors.light.primary.base} />}
+          iconPosition="left"
+          containerStyle={{ margin: 20 }} // ✅ mêmes marges que l'ancien bouton
+          onPress={handleLogout}
+        />
       </ScrollView>
     </SafeAreaView>
   );

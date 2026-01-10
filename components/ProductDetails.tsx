@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
+import { View, StyleSheet, ScrollView, Image } from "react-native";
+import { Text } from "@/components/ui/Text";
 import { Accordion } from "@/components/Accordion";
 import { ScoreIndicator } from "@/components/ScoreIndicator";
 import type {
