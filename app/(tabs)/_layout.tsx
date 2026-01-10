@@ -1,36 +1,24 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { Colors } from "@/constants/theme";
-import { HapticTab } from "@/components/haptic-tab";
-import { FontFamilies } from "@/constants/typography";
 import UserIcon from "@/assets/icons/user.svg";
 import ScanIcon from "@/assets/icons/scan.svg";
 import HeartIcon from "@/assets/icons/heart.svg";
 import SearchIcon from "@/assets/icons/search.svg";
 import HistoryIcon from "@/assets/icons/history.svg";
+import { PawkaTabBar } from "@/components/navigation/PawkaTabBar";
 
 export default function TabsLayout() {
   return (
     <Tabs
       initialRouteName="search"
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: Colors.light.primary.base,
-        tabBarInactiveTintColor: Colors.light.greyscale[60],
-        tabBarButton: HapticTab,
-
-        tabBarLabelStyle: {
-          fontFamily: FontFamilies.text.bold,
-          fontSize: 12,
-          textAlign: "center",
-        },
-      }}
+      screenOptions={{ headerShown: false }}
+      tabBar={(props) => <PawkaTabBar {...props} />}
     >
       <Tabs.Screen
         name="scan/scan"
         options={{
           title: "Scan",
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <ScanIcon width={22} height={22} fill={color} />
           ),
         }}
@@ -47,7 +35,7 @@ export default function TabsLayout() {
         name="history"
         options={{
           title: "Historique",
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <HistoryIcon width={22} height={22} fill={color} />
           ),
         }}
@@ -57,7 +45,7 @@ export default function TabsLayout() {
         name="recommendation"
         options={{
           title: "Favoris",
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <HeartIcon width={22} height={22} fill={color} />
           ),
         }}
@@ -67,7 +55,7 @@ export default function TabsLayout() {
         name="search"
         options={{
           title: "Recherche",
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <SearchIcon width={22} height={22} fill={color} />
           ),
         }}
@@ -77,8 +65,7 @@ export default function TabsLayout() {
         name="user/profile"
         options={{
           title: "Profil",
-          tabBarLabel: "Profil",
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <UserIcon width={22} height={22} fill={color} />
           ),
         }}
