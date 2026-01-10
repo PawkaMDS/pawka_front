@@ -19,70 +19,73 @@ export function PawkaTabBar({ state, descriptors, navigation }: BottomTabBarProp
 
     return (
         <View style={styles.outer}>
-            <View style={[styles.barWrapper, { paddingBottom: insets.bottom }]}>
-                <View style={[styles.bar, { backgroundColor: c.secondary.base }]}>
-                    {visibleRoutes.map(({ route, index }, visibleIndex) => {
-                        const isFocused = state.index === index;
-                        const { options } = descriptors[route.key];
+            <View style={[styles.shell, { backgroundColor: c.secondary.base }]}>
+                <View style={styles.barWrapper}>
+                    <View style={[styles.bar, { backgroundColor: c.secondary.base }]}>
+                        {visibleRoutes.map(({ route, index }, visibleIndex) => {
+                            const isFocused = state.index === index;
+                            const { options } = descriptors[route.key];
 
-                        const label = String(options.tabBarLabel ?? options.title ?? route.name);
+                            const label = String(options.tabBarLabel ?? options.title ?? route.name);
 
-                        const onPress = () => {
-                            const event = navigation.emit({
-                                type: "tabPress",
-                                target: route.key,
-                                canPreventDefault: true,
+                            const onPress = () => {
+                                const event = navigation.emit({
+                                    type: "tabPress",
+                                    target: route.key,
+                                    canPreventDefault: true,
+                                });
+
+                                if (!isFocused && !event.defaultPrevented) {
+                                    navigation.navigate(route.name as never);
+                                }
+                            };
+
+                            const icon = options.tabBarIcon?.({
+                                focused: isFocused,
+                                color: isFocused ? c.secondary.base : c.greyscale[90],
+                                size: 22,
                             });
 
-                            if (!isFocused && !event.defaultPrevented) {
-                                navigation.navigate(route.name as never);
-                            }
-                        };
+                            const showSeparator =
+                                visibleIndex < visibleRoutes.length - 1 &&
+                                !isFocused &&
+                                !(state.index === visibleRoutes[visibleIndex + 1].index);
 
-                        const icon = options.tabBarIcon?.({
-                            focused: isFocused,
-                            color: isFocused ? c.secondary.base : c.greyscale[90],
-                            size: 22,
-                        });
-
-                        const showSeparator =
-                            visibleIndex < visibleRoutes.length - 1 &&
-                            !isFocused &&
-                            !(state.index === visibleRoutes[visibleIndex + 1].index);
-
-                        return (
-                            <React.Fragment key={route.key}>
-                                <Pressable
-                                    onPress={onPress}
-                                    style={[
-                                        styles.item,
-                                        isFocused && { backgroundColor: c.primary.base },
-                                    ]}
-                                >
-                                    <View style={styles.iconWrap}>{icon}</View>
-                                    <Text
-                                        numberOfLines={1}
+                            return (
+                                <React.Fragment key={route.key}>
+                                    <Pressable
+                                        onPress={onPress}
                                         style={[
-                                            styles.label,
-                                            {
-                                                fontFamily: FontFamilies.text.medium,
-                                                color: isFocused ? c.secondary.base : c.greyscale[90],
-                                                marginTop: 2,
-                                                fontSize: 11,
-                                            },
+                                            styles.item,
+                                            isFocused && { backgroundColor: c.primary.base },
                                         ]}
                                     >
-                                        {label}
-                                    </Text>
-                                </Pressable>
+                                        <View style={styles.iconWrap}>{icon}</View>
+                                        <Text
+                                            numberOfLines={1}
+                                            style={[
+                                                styles.label,
+                                                {
+                                                    fontFamily: FontFamilies.text.medium,
+                                                    color: isFocused ? c.secondary.base : c.greyscale[90],
+                                                    marginTop: 2,
+                                                    fontSize: 11,
+                                                },
+                                            ]}
+                                        >
+                                            {label}
+                                        </Text>
+                                    </Pressable>
 
-                                {showSeparator ? (
-                                    <View style={[styles.separator, { backgroundColor: c.primary[200] }]} />
-                                ) : null}
-                            </React.Fragment>
-                        );
-                    })}
+                                    {showSeparator ? (
+                                        <View style={[styles.separator, { backgroundColor: c.primary[200] }]} />
+                                    ) : null}
+                                </React.Fragment>
+                            );
+                        })}
+                    </View>
                 </View>
+                <View style={{ height: insets.bottom }} />
             </View>
         </View>
     );
@@ -93,6 +96,13 @@ const styles = StyleSheet.create({
     outer: {
         width: "100%",
         backgroundColor: "transparent",
+    },
+
+    shell: {
+        width: "100%",
+        overflow: "hidden",
+        borderTopLeftRadius: 28,
+        borderTopRightRadius: 28,
     },
 
     // Safe area + bar container
