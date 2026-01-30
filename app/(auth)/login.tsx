@@ -63,7 +63,7 @@ export default function LoginScreen() {
       setUser(result.user);
       
       // Redirection vers la page principale
-      router.replace('/(tabs)/search');
+      router.replace('/(tabs)/scan/scan');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erreur de connexion';
       Alert.alert('Erreur', errorMessage);

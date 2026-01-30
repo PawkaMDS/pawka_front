@@ -24,7 +24,7 @@ export default function Index() {
   // Redirection automatique selon l'état de connexion
   if (isAuthenticated) {
     // Utilisateur connecté → aller dans l'app
-    return <Redirect href="/(tabs)/search" />;
+    return <Redirect href="/(tabs)/scan/scan" />;
   }
 
   // Utilisateur non connecté → afficher la page de bienvenue
