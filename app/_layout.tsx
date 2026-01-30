@@ -38,6 +38,10 @@ export default function RootLayout() {
       <StatusBar style="dark" />
 
       <Stack screenOptions={{ headerShown: false }}>
+        {/* Groupe d'authentification (welcome, login, register) */}
+        <Stack.Screen name="(auth)" />
+        
+        {/* Groupe principal de l'application (tabs) */}
         <Stack.Screen name="(tabs)" />
       </Stack>
     </AuthProvider>
