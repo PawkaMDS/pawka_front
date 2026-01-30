@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ProductDetails } from '@/components/ProductDetails';
 import PageLayout from '@/components/layout/PageLayout';
 
+/*
 const getAnimalIcon = (product: DetailedProduct): string => {
     const animalTypeCode = product.product_foods?.[0]?.animal_type?.code;
 
@@ -41,6 +42,7 @@ const getScoreColor = (score: number) => {
     if (score >= 21) return '#F57C00';
     return '#D32F2F';
 };
+*/
 
 export default function ProductPage() {
     const params = useLocalSearchParams<{ id: string }>();
@@ -78,8 +80,10 @@ export default function ProductPage() {
         };
     }, [params.id]);
 
+    /*
     const overallScore = getOverallScore(product || undefined);
     const scoreColor = overallScore ? getScoreColor(overallScore) : '#999';
+    */
 
     if (loading) {
         return (
@@ -111,53 +115,19 @@ export default function ProductPage() {
         );
     }
 
+    // If successfully loaded product, show details
     return (
         <PageLayout>
-            <View style={styles.peekContainer}>
-                <View style={styles.peekContent}>
-                    <View style={styles.peekImageContainer}>
-                        {product.image_url ? (
-                            <Image source={{ uri: product.image_url }} style={styles.peekImage} resizeMode="contain" />
-                        ) : (
-                            <View style={[styles.peekImage, styles.peekImagePlaceholder]}>
-                                <Ionicons name={getAnimalIcon(product) as any} size={40} color="#CCC" />
-                            </View>
-                        )}
-                    </View>
-
-                    <View style={styles.peekInfo}>
-                        <Text style={styles.peekTitle} numberOfLines={2}>{product.name}</Text>
-                        {product.brand && <Text style={styles.peekBrand} numberOfLines={1}>{product.brand}</Text>}
-                    </View>
-
-                    {overallScore !== null && (
-                        <View style={[styles.scoreBadge, { backgroundColor: scoreColor }]}>
-                            <Text style={styles.scoreText}>{overallScore}</Text>
-                            <Text style={styles.scoreMax}>/100</Text>
-                        </View>
-                    )}
-                </View>
-                <Text style={styles.swipeHint}>Fiche produit</Text>
-            </View>
-
             <View style={styles.contentContainer}>
+                
                 <ProductDetails product={product} />
             </View>
-            </PageLayout>
+        </PageLayout>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#F5F5F5' },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    peekContainer: { padding: 16, paddingTop: 8, backgroundColor: '#fff', marginBottom: 8 },
-    peekContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
-    peekImageContainer: { width: 80, height: 80 },
-    peekImage: { width: 80, height: 80, borderRadius: 8, backgroundColor: '#F5F5F5' },
-    peekImagePlaceholder: { justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#E0E0E0', borderStyle: 'dashed' },
-    peekInfo: { flex: 1, justifyContent: 'center', gap: 4, marginLeft: 12 },
-    peekTitle: { fontSize: 16, fontWeight: '700', color: '#333' },
-    peekBrand: { fontSize: 13, color: '#666', marginBottom: 4 },
     scoreBadge: { flexDirection: 'row', alignItems: 'baseline', alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, gap: 2 },
     scoreText: { fontSize: 18, fontWeight: 'bold', color: '#fff' },
     scoreMax: { fontSize: 12, fontWeight: '600', color: '#fff', opacity: 0.9 },
