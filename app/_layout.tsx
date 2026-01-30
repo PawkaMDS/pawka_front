@@ -1,49 +1,28 @@
-import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { AuthProvider } from "@/lib/auth/AuthContext";
+import { Slot, Redirect } from "expo-router";
+import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
+import { View, ActivityIndicator } from "react-native";
 
-import { useEffect } from "react";
-import { Platform } from "react-native";
-import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
-import * as NavigationBar from "expo-navigation-bar";
+function RootNavigation() {
+  const { isLoading, isAuthenticated } = useAuth();
 
-SplashScreen.preventAutoHideAsync();
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+  if (!isAuthenticated) {
+    return <Redirect href="/(auth)/welcome" />;
+  }
+  return <Redirect href="/(tabs)/scan/scan" />;
+}
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    "NewZen-Regular": require("@/assets/fonts/NewZen-Regular.otf"),
-    "NewZen-Medium": require("@/assets/fonts/NewZen-Medium.otf"),
-    "NewZen-Bold": require("@/assets/fonts/NewZen-Bold.otf"),
-
-    "TommySoft-Regular": require("@/assets/fonts/MadeTommySoft-Regular.otf"),
-    "TommySoft-Medium": require("@/assets/fonts/MadeTommySoft-Medium.otf"),
-    "TommySoft-Bold": require("@/assets/fonts/MadeTommySoft-Bold.otf"),
-  });
-
-  // Android: dark-style navigation bar buttons
-  useEffect(() => {
-    if (Platform.OS !== "android") return;
-    NavigationBar.setButtonStyleAsync("dark");
-  }, []);
-
-  useEffect(() => {
-    if (fontsLoaded) SplashScreen.hideAsync();
-  }, [fontsLoaded]);
-
-  if (!fontsLoaded) return null;
-
   return (
     <AuthProvider>
-      <StatusBar style="dark" />
-
-      <Stack screenOptions={{ headerShown: false }}>
-        {/* Groupe d'authentification (welcome, login, register) */}
-        <Stack.Screen name="(auth)" />
-        
-        {/* Groupe principal de l'application (tabs) */}
-        <Stack.Screen name="(tabs)" />
-      </Stack>
+      <RootNavigation />
+      <Slot />
     </AuthProvider>
   );
 }
