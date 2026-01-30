@@ -5,12 +5,26 @@ import { Heading } from '@/components/ui/Heading';
 import { getSearchHistory, SearchHistoryItem } from '@/lib/api/searchHistory';
 import { useRouter } from 'expo-router';
 import PageLayout from '@/components/layout/PageLayout';
+import { Colors } from '@/constants/theme';
 
 export default function History() {
   const [items, setItems] = useState<SearchHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  const formatScanDate = (value?: string | number | null) => {
+    if (!value) return null;
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return null;
+
+    return d.toLocaleDateString("fr-FR", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
 
   useEffect(() => {
     let mounted = true;
@@ -39,34 +53,64 @@ export default function History() {
 
   return (
     <PageLayout>
-      <Heading as="h1">Historique</Heading>
+      <Heading as="h3" style={styles.heading}>Mon historique</Heading>
 
       {error ? (
         <Text style={{ marginTop: 16 }}>{error}</Text>
       ) : (
         <FlatList
           data={items}
-          keyExtractor={(item, index) => String(item.id ?? item.product?.id ?? item.product?.code_ean ?? index)}
+          keyExtractor={(item, index) =>
+            String(item.id ?? item.product?.id ?? item.product?.code_ean ?? index)
+          }
           contentContainerStyle={{ paddingTop: 16 }}
-          renderItem={({ item }) => {
+          renderItem={({ item, index }) => {
             const product = item.product;
             const productId = product?.id ?? item.product_id;
+            const isLast = index === items.length - 1;
+
             return (
-              <TouchableOpacity
+              <TouchableOpacity style={[styles.item, !isLast && styles.itemWithDivider]}
                 onPress={() => {
                   if (!productId) return;
-                  // navigate to product page inside tabs
                   router.push(`/(tabs)/product/${productId}`);
-                }}
-                style={styles.row}
-              >
-                {product?.image_url ? (
-                  <Image source={{ uri: product.image_url }} style={styles.image} />
-                ) : (
-                  <View style={styles.placeholder} />
-                )}
-                <Text style={styles.name}>{product?.name ?? 'Produit inconnu'}</Text>
+                }}>
+                <View style={styles.col}>
+                  {product?.image_url ? (
+                    <Image source={{ uri: product.image_url }} style={styles.thumb} />
+                  ) : (
+                    <View style={styles.thumbPlaceholder} />
+                  )}
+                </View>
+
+                <View style={styles.col}>
+                  <Heading as="h5" numberOfLines={2} style={styles.title}>
+                    {product?.name ?? "Produit inconnu"}
+                  </Heading>
+                  {!!product?.brand && (
+                    <Text style={styles.brand} numberOfLines={1}>
+                      {product.brand}
+                    </Text>
+                  )}
+                  <Text>
+                    *note*
+                  </Text>
+                  {(() => {
+                    const scanDate =
+                      formatScanDate((item as any).createdAt) ??
+                      formatScanDate((item as any).created_at) ??
+                      formatScanDate((item as any).scannedAt) ??
+                      formatScanDate((item as any).scanned_at);
+
+                    return scanDate ? (
+                      <Text style={styles.scanDate} numberOfLines={1}>
+                        Scanné le {scanDate}
+                      </Text>
+                    ) : null;
+                  })()}
+                </View>
               </TouchableOpacity>
+
             );
           }}
         />
@@ -76,10 +120,60 @@ export default function History() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 16, paddingTop: 16 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8 },
-  image: { width: 56, height: 56, borderRadius: 8, backgroundColor: '#eee' },
-  placeholder: { width: 56, height: 56, borderRadius: 8, backgroundColor: '#eee' },
-  name: { marginLeft: 12 },
+  heading: {
+    marginTop: 32,
+    color: Colors.light.primary.base,
+  },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+
+  item: {
+    flexDirection: "row",
+    gap: 12,
+    paddingVertical: 24,
+    alignItems: "flex-start",
+  },
+
+  itemWithDivider: {
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.light.accent.base,
+  },
+
+  col: {
+    flex: 1,
+  },
+
+  thumb: {
+    width: "100%",
+    aspectRatio: 1,
+    borderRadius: 12,
+    backgroundColor: Colors.light.greyscale[20],
+  },
+
+  thumbPlaceholder: {
+    width: "100%",
+    aspectRatio: 1,
+    borderRadius: 12,
+    backgroundColor: Colors.light.greyscale[20],
+  },
+
+  meta: {
+    flex: 1,
+    justifyContent: "center",
+  },
+
+  title: {
+    // tu peux ajuster si ton Heading h5 est trop grand/petit
+    color: Colors.light.greyscale[90],
+  },
+
+  brand: {
+    marginTop: 2,
+    color: Colors.light.greyscale[60],
+  },
+
+  scanDate: {
+    marginTop: 6,
+    color: Colors.light.greyscale[50],
+    fontSize: 12,
+  },
 });
