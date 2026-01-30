@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Image, ActivityIndicator, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Image, ActivityIndicator, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Text } from '@/components/ui/Text';
 import { getProductById } from '@/lib/api/products';
 import type { DetailedProduct } from '@/types/product';
 import { Ionicons } from '@expo/vector-icons';
 import { ProductDetails } from '@/components/ProductDetails';
+import PageLayout from '@/components/layout/PageLayout';
 
 const getAnimalIcon = (product: DetailedProduct): string => {
     const animalTypeCode = product.product_foods?.[0]?.animal_type?.code;
@@ -82,30 +83,36 @@ export default function ProductPage() {
 
     if (loading) {
         return (
-            <SafeAreaView style={styles.center}>
-                <ActivityIndicator />
-            </SafeAreaView>
+            <PageLayout>
+                <View style={styles.center}>
+                    <ActivityIndicator />
+                </View>
+            </PageLayout>
         );
     }
 
     if (error) {
         return (
-            <SafeAreaView style={styles.center}>
-                <Text>{error}</Text>
-            </SafeAreaView>
+            <PageLayout>
+                <View style={styles.center}>
+                    <Text>{error}</Text>
+                </View>
+            </PageLayout>
         );
     }
 
     if (!product) {
         return (
-            <SafeAreaView style={styles.center}>
-                <Text>Produit introuvable</Text>
-            </SafeAreaView>
+            <PageLayout>
+                <View style={styles.center}>
+                    <Text>Produit introuvable</Text>
+                </View>
+            </PageLayout>
         );
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <PageLayout>
             <View style={styles.peekContainer}>
                 <View style={styles.peekContent}>
                     <View style={styles.peekImageContainer}>
@@ -136,7 +143,7 @@ export default function ProductPage() {
             <View style={styles.contentContainer}>
                 <ProductDetails product={product} />
             </View>
-        </SafeAreaView>
+            </PageLayout>
     );
 }
 

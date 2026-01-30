@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, Image, ActivityIndicator, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, FlatList, Image, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from "@/components/ui/Text";
 import { Heading } from '@/components/ui/Heading';
 import { getSearchHistory, SearchHistoryItem } from '@/lib/api/searchHistory';
 import { useRouter } from 'expo-router';
+import PageLayout from '@/components/layout/PageLayout';
 
 export default function History() {
   const [items, setItems] = useState<SearchHistoryItem[]>([]);
@@ -28,14 +29,16 @@ export default function History() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.center}>
-        <ActivityIndicator />
-      </SafeAreaView>
+      <PageLayout>
+        <View style={styles.center}>
+          <ActivityIndicator />
+        </View>
+      </PageLayout>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <PageLayout>
       <Heading as="h1">Historique</Heading>
 
       {error ? (
@@ -68,7 +71,7 @@ export default function History() {
           }}
         />
       )}
-    </SafeAreaView>
+    </PageLayout>
   );
 }
 
