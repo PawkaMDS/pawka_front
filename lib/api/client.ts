@@ -5,7 +5,8 @@ export const getApiBaseUrl = (): string => {
   const envUrl = process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, '');
   if (envUrl) return envUrl;
 
-  return 'http://192.168.1.21:8081';
+  //TODO mettre l'URL de production ici
+  return 'http://localhost:8081';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
