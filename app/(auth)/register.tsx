@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from "react";
 import {
   View,
-  Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
@@ -10,19 +9,21 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { register } from '@/lib/api/auth';
-import { useAuth } from '@/lib/auth/AuthContext';
+} from "react-native";
+import { Text } from "@/components/ui/Text";
+import { useRouter } from "expo-router";
+import { register } from "@/lib/api/auth";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function RegisterScreen() {
   const router = useRouter();
   const { setUser } = useAuth();
-  
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{
     name?: string;
@@ -39,32 +40,28 @@ export default function RegisterScreen() {
       confirmPassword?: string;
     } = {};
 
-    // Validation nom
     if (!name.trim()) {
-      newErrors.name = 'Le nom est requis';
+      newErrors.name = "Le nom est requis";
     } else if (name.trim().length < 2) {
-      newErrors.name = 'Le nom doit contenir au moins 2 caractères';
+      newErrors.name = "Le nom doit contenir au moins 2 caractères";
     }
 
-    // Validation email
     if (!email.trim()) {
-      newErrors.email = 'L\'email est requis';
+      newErrors.email = "L'email est requis";
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email invalide';
+      newErrors.email = "Email invalide";
     }
 
-    // Validation password
     if (!password) {
-      newErrors.password = 'Le mot de passe est requis';
+      newErrors.password = "Le mot de passe est requis";
     } else if (password.length < 6) {
-      newErrors.password = 'Le mot de passe doit contenir au moins 6 caractères';
+      newErrors.password = "Le mot de passe doit contenir au moins 6 caractères";
     }
 
-    // Validation confirmation password
     if (!confirmPassword) {
-      newErrors.confirmPassword = 'La confirmation est requise';
+      newErrors.confirmPassword = "La confirmation est requise";
     } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Les mots de passe ne correspondent pas';
+      newErrors.confirmPassword = "Les mots de passe ne correspondent pas";
     }
 
     setErrors(newErrors);
@@ -72,10 +69,8 @@ export default function RegisterScreen() {
   };
 
   const handleRegister = async () => {
-    // Reset errors
     setErrors({});
 
-    // Validation
     if (!validateForm()) {
       return;
     }
@@ -88,24 +83,22 @@ export default function RegisterScreen() {
         email: email.trim(),
         password,
       });
-      
-      // Mettre à jour le contexte auth
+
       setUser(result.user);
-      
-      // Afficher un message de succès
+
       Alert.alert(
-        'Inscription réussie',
-        'Bienvenue ! Votre compte a été créé avec succès.',
+        "Inscription réussie",
+        "Bienvenue ! Votre compte a été créé avec succès.",
         [
           {
-            text: 'OK',
-            onPress: () => router.replace('/(tabs)/search'),
+            text: "OK",
+            onPress: () => router.replace("/(screens)/login_loading"),
           },
         ]
       );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Erreur d\'inscription';
-      Alert.alert('Erreur', errorMessage);
+      const errorMessage = error instanceof Error ? error.message : "Erreur d'inscription";
+      Alert.alert("Erreur", errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -116,198 +109,278 @@ export default function RegisterScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
+    <LinearGradient colors={["#0A0A0F", "#1A1A2E"]} style={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.keyboardView}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <View style={styles.content}>
-          <Text style={styles.title}>Inscription</Text>
-          <Text style={styles.subtitle}>Créez votre compte</Text>
-
-          {/* Name Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Nom</Text>
-            <TextInput
-              style={[styles.input, errors.name && styles.inputError]}
-              placeholder="Votre nom"
-              value={name}
-              onChangeText={(text) => {
-                setName(text);
-                if (errors.name) setErrors({ ...errors, name: undefined });
-              }}
-              autoCapitalize="words"
-              autoComplete="name"
-              editable={!isLoading}
-            />
-            {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.logo}>🐾</Text>
+            <Text style={styles.title}>Inscription</Text>
+            <Text style={styles.subtitle}>Créez votre compte Pawka</Text>
           </View>
 
-          {/* Email Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={[styles.input, errors.email && styles.inputError]}
-              placeholder="votre@email.com"
-              value={email}
-              onChangeText={(text) => {
-                setEmail(text);
-                if (errors.email) setErrors({ ...errors, email: undefined });
-              }}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              autoComplete="email"
-              editable={!isLoading}
-            />
-            {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
-          </View>
+          {/* Form */}
+          <View style={styles.form}>
+            {/* Name Input */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Nom complet</Text>
+              <View style={[styles.inputWrapper, errors.name && styles.inputError]}>
+                <Text style={styles.inputIcon}>👤</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Votre nom"
+                  placeholderTextColor="#666"
+                  value={name}
+                  onChangeText={(text) => {
+                    setName(text);
+                    if (errors.name) setErrors({ ...errors, name: undefined });
+                  }}
+                  autoCapitalize="words"
+                  autoComplete="name"
+                  editable={!isLoading}
+                />
+              </View>
+              {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+            </View>
 
-          {/* Password Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Mot de passe</Text>
-            <TextInput
-              style={[styles.input, errors.password && styles.inputError]}
-              placeholder="••••••••"
-              value={password}
-              onChangeText={(text) => {
-                setPassword(text);
-                if (errors.password) setErrors({ ...errors, password: undefined });
-              }}
-              secureTextEntry
-              autoCapitalize="none"
-              autoComplete="password-new"
-              editable={!isLoading}
-            />
-            {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
-          </View>
+            {/* Email Input */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Adresse email</Text>
+              <View style={[styles.inputWrapper, errors.email && styles.inputError]}>
+                <Text style={styles.inputIcon}>✉️</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="votre@email.com"
+                  placeholderTextColor="#666"
+                  value={email}
+                  onChangeText={(text) => {
+                    setEmail(text);
+                    if (errors.email) setErrors({ ...errors, email: undefined });
+                  }}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  autoComplete="email"
+                  editable={!isLoading}
+                />
+              </View>
+              {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+            </View>
 
-          {/* Confirm Password Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Confirmer le mot de passe</Text>
-            <TextInput
-              style={[styles.input, errors.confirmPassword && styles.inputError]}
-              placeholder="••••••••"
-              value={confirmPassword}
-              onChangeText={(text) => {
-                setConfirmPassword(text);
-                if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: undefined });
-              }}
-              secureTextEntry
-              autoCapitalize="none"
-              autoComplete="password-new"
-              editable={!isLoading}
-            />
-            {errors.confirmPassword && (
-              <Text style={styles.errorText}>{errors.confirmPassword}</Text>
-            )}
-          </View>
+            {/* Password Input */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Mot de passe</Text>
+              <View style={[styles.inputWrapper, errors.password && styles.inputError]}>
+                <Text style={styles.inputIcon}>🔒</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="••••••••"
+                  placeholderTextColor="#666"
+                  value={password}
+                  onChangeText={(text) => {
+                    setPassword(text);
+                    if (errors.password) setErrors({ ...errors, password: undefined });
+                  }}
+                  secureTextEntry
+                  autoCapitalize="none"
+                  autoComplete="password-new"
+                  editable={!isLoading}
+                />
+              </View>
+              {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+            </View>
 
-          {/* Register Button */}
-          <TouchableOpacity
-            style={[styles.button, isLoading && styles.buttonDisabled]}
-            onPress={handleRegister}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>S'inscrire</Text>
-            )}
-          </TouchableOpacity>
+            {/* Confirm Password Input */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Confirmer le mot de passe</Text>
+              <View style={[styles.inputWrapper, errors.confirmPassword && styles.inputError]}>
+                <Text style={styles.inputIcon}>🔒</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="••••••••"
+                  placeholderTextColor="#666"
+                  value={confirmPassword}
+                  onChangeText={(text) => {
+                    setConfirmPassword(text);
+                    if (errors.confirmPassword)
+                      setErrors({ ...errors, confirmPassword: undefined });
+                  }}
+                  secureTextEntry
+                  autoCapitalize="none"
+                  autoComplete="password-new"
+                  editable={!isLoading}
+                />
+              </View>
+              {errors.confirmPassword && (
+                <Text style={styles.errorText}>{errors.confirmPassword}</Text>
+              )}
+            </View>
 
-          {/* Login Link */}
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Déjà un compte ? </Text>
-            <TouchableOpacity onPress={goToLogin} disabled={isLoading}>
-              <Text style={styles.link}>Se connecter</Text>
+            {/* Register Button */}
+            <TouchableOpacity
+              style={[styles.registerButton, isLoading && styles.buttonDisabled]}
+              onPress={handleRegister}
+              disabled={isLoading}
+              activeOpacity={0.8}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.registerButtonText}>Créer mon compte</Text>
+              )}
+            </TouchableOpacity>
+
+            {/* Divider */}
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>ou</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            {/* Login Link */}
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={goToLogin}
+              disabled={isLoading}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.loginButtonText}>J'ai déjà un compte</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+  },
+  keyboardView: {
+    flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 60,
+    paddingBottom: 40,
   },
-  content: {
-    padding: 24,
+  header: {
+    alignItems: "center",
+    marginBottom: 40,
+  },
+  logo: {
+    fontSize: 60,
+    marginBottom: 16,
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+    color: "#fff",
     marginBottom: 8,
-    color: '#1a1a1a',
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
-    marginBottom: 32,
+    color: "#999",
+  },
+  form: {
+    flex: 1,
   },
   inputContainer: {
     marginBottom: 20,
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
+    color: "#fff",
     marginBottom: 8,
-    color: '#1a1a1a',
   },
-  input: {
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.05)",
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#f9f9f9',
+    borderColor: "rgba(255,255,255,0.1)",
+    paddingHorizontal: 16,
   },
   inputError: {
-    borderColor: '#ff4444',
-    backgroundColor: '#fff5f5',
+    borderColor: "#FF6B6B",
+    backgroundColor: "rgba(255,107,107,0.05)",
+  },
+  inputIcon: {
+    fontSize: 20,
+    marginRight: 12,
+  },
+  input: {
+    flex: 1,
+    color: "#fff",
+    fontSize: 16,
+    paddingVertical: 16,
   },
   errorText: {
-    color: '#ff4444',
+    color: "#FF6B6B",
     fontSize: 12,
-    marginTop: 4,
+    marginTop: 6,
+    marginLeft: 4,
   },
-  button: {
-    backgroundColor: '#007AFF',
-    borderRadius: 8,
-    padding: 16,
-    alignItems: 'center',
+  registerButton: {
+    backgroundColor: "#6C63FF",
+    borderRadius: 16,
+    paddingVertical: 18,
+    alignItems: "center",
     marginTop: 8,
-    marginBottom: 16,
+    marginBottom: 24,
+    shadowColor: "#6C63FF",
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 8,
   },
   buttonDisabled: {
-    backgroundColor: '#99c9ff',
+    backgroundColor: "#4A4A6A",
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+  registerButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "700",
   },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+  divider: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 24,
   },
-  footerText: {
-    color: '#666',
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "rgba(255,255,255,0.1)",
+  },
+  dividerText: {
+    color: "#666",
     fontSize: 14,
+    marginHorizontal: 16,
   },
-  link: {
-    color: '#007AFF',
-    fontSize: 14,
-    fontWeight: '600',
+  loginButton: {
+    backgroundColor: "rgba(255,255,255,0.05)",
+    borderRadius: 16,
+    paddingVertical: 18,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.1)",
+  },
+  loginButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "600",
   },
 });

@@ -1,9 +1,21 @@
 import { View, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Text } from "@/components/ui/Text";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const ONBOARDING_KEY = "hasSeenOnboarding";
 
 export default function WelcomeScreen() {
   const router = useRouter();
+
+  const handleViewOnboarding = async () => {
+    try {
+      await AsyncStorage.removeItem(ONBOARDING_KEY);
+      router.replace("/(screens)/onboarding_final");
+    } catch (error) {
+      console.error("Error resetting onboarding:", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -52,11 +64,8 @@ export default function WelcomeScreen() {
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>
-          En continuant, vous acceptez nos{" "}
-        </Text>
-        <TouchableOpacity>
-          <Text style={styles.footerLink}>Conditions d'utilisation</Text>
+        <TouchableOpacity onPress={handleViewOnboarding} activeOpacity={0.7}>
+          <Text style={styles.footerLink}>Voir l'onboarding</Text>
         </TouchableOpacity>
       </View>
     </View>
