@@ -1,6 +1,12 @@
 import { Slot, Redirect } from "expo-router";
 import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
-import { View, ActivityIndicator } from "react-native";
+import { View, ActivityIndicator, Platform } from "react-native";
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+import * as NavigationBar from "expo-navigation-bar";
+import { useEffect } from "react";
+
+SplashScreen.preventAutoHideAsync();
 
 function RootNavigation() {
   const { isLoading, isAuthenticated } = useAuth();
@@ -19,6 +25,27 @@ function RootNavigation() {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    "NewZen-Regular": require("@/assets/fonts/NewZen-Regular.otf"),
+    "NewZen-Medium": require("@/assets/fonts/NewZen-Medium.otf"),
+    "NewZen-Bold": require("@/assets/fonts/NewZen-Bold.otf"),
+    "TommySoft-Regular": require("@/assets/fonts/MadeTommySoft-Regular.otf"),
+    "TommySoft-Medium": require("@/assets/fonts/MadeTommySoft-Medium.otf"),
+    "TommySoft-Bold": require("@/assets/fonts/MadeTommySoft-Bold.otf"),
+  });
+
+  useEffect(() => {
+    if (Platform.OS === "android") {
+      NavigationBar.setButtonStyleAsync("dark");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (fontsLoaded) SplashScreen.hideAsync();
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) return null;
+
   return (
     <AuthProvider>
       <RootNavigation />
