@@ -5,6 +5,7 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import * as NavigationBar from "expo-navigation-bar";
 import { useEffect } from "react";
+import * as SystemUI from "expo-system-ui";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -37,6 +38,7 @@ export default function RootLayout() {
   useEffect(() => {
     if (Platform.OS === "android") {
       NavigationBar.setButtonStyleAsync("dark");
+      SystemUI.setBackgroundColorAsync("#FAFAFAFF");
     }
   }, []);
 
