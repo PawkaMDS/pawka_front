@@ -7,6 +7,8 @@ import type {
   ProductFood,
   AnalyticalComposition,
 } from "@/types/product";
+import { Heading } from "./ui/Heading";
+import { Colors } from "@/constants/theme";
 
 interface ProductDetailsProps {
   product: DetailedProduct;
@@ -205,27 +207,43 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* En-tête avec image et infos de base */}
       <View style={styles.header}>
-        {product.image_url && (
-          <Image
-            source={{ uri: product.image_url }}
-            style={styles.productImage}
-            resizeMode="contain"
-          />
-        )}
+        <Heading as="h4" style={styles.title}>
+          {product.name}
+        </Heading>
+        <View style={styles.twoCols}>
+          <View style={styles.col}>
+            {product.brand && (
+              <Text style={styles.productBrand}>{product.brand}</Text>
+            )}
+            <Text>*card*</Text>
+          </View>
 
-        <View style={styles.headerInfo}>
-          <Text style={styles.productName}>{product.name}</Text>
-          {product.brand && (
-            <Text style={styles.productBrand}>{product.brand}</Text>
-          )}
-          <Text style={styles.productEAN}>EAN: {product.code_ean}</Text>
-          {product.is_verified && (
-            <View style={styles.verifiedBadge}>
-              <Text style={styles.verifiedText}>Vérifié</Text>
-            </View>
-          )}
+          <View style={styles.col}>
+            {!!product.image_url && (
+              <Image
+                source={{ uri: product.image_url }}
+                style={styles.squareImage}
+                resizeMode="cover"
+              />
+            )}
+          </View>
+        </View>
+
+        <View style={styles.headerVerified}>
+          <Heading as="h5">
+            Ce que disent nos experts
+          </Heading>
+          <Text>
+            Ce produit contient plusieurs ingrédients peu qualitatifs (sous-produits animaux, colorants, céréales en excès). Il peut convenir ponctuellement, mais n’est pas recommandé pour un usage quotidien, surtout chez les animaux sensibles ou stérilisés.
+          </Text>
         </View>
       </View>
+
+      {product.is_verified && (
+        <View style={styles.verifiedBadge}>
+          <Text style={styles.verifiedText}>Vérifié</Text>
+        </View>
+      )}
 
       {/* Score global */}
       {productFood?.scores?.overall !== undefined && (
@@ -346,37 +364,41 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-  },
-  header: {
-    backgroundColor: "#fff",
-    padding: 20,
-    marginBottom: 16,
-  },
-  productImage: {
-    width: "100%",
-    height: 200,
-    marginBottom: 16,
-  },
-  headerInfo: {
-    gap: 8,
-  },
-  productName: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
+  title: {
+    marginTop: 4,
+    marginBottom: 12,
+    color: Colors.light.primary.base,
   },
   productBrand: {
-    fontSize: 18,
-    color: "#666",
     fontWeight: "500",
+    marginBottom: 4,
   },
-  productEAN: {
-    fontSize: 14,
-    color: "#888",
-    fontFamily: "monospace",
+  twoCols: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 16,
+  },
+  col: {
+    flex: 1,
+  },
+  squareImage: {
+    width: "100%",
+    aspectRatio: 1,
+    borderRadius: 12,
+  },
+  container: {
+    flex: 1,
+  },
+  header: {
+    marginBottom: 16,
+    marginTop: 28,
+  },
+  headerVerified: {
+    gap: 8,
+    backgroundColor: Colors.light.secondary.base,
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 12,
   },
   verifiedBadge: {
     backgroundColor: "#E8F5E9",
@@ -393,7 +415,6 @@ const styles = StyleSheet.create({
   },
   scoreSection: {
     backgroundColor: "#fff",
-    padding: 20,
     marginBottom: 16,
     alignItems: "center",
   },
@@ -404,7 +425,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   accordionsContainer: {
-    padding: 16,
     paddingTop: 0,
   },
   ingredientsContainer: {
