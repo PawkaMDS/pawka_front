@@ -9,6 +9,9 @@ import type {
 } from "@/types/product";
 import { Heading } from "./ui/Heading";
 import { Colors } from "@/constants/theme";
+import { ScoreCard } from "@/components/ui/ScoreCard";
+import { getOverallScore } from "@/utils/score";
+
 
 interface ProductDetailsProps {
   product: DetailedProduct;
@@ -203,6 +206,8 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     return sizes[size] || size;
   };
 
+  const overall = getOverallScore(product);
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* En-tête avec image et infos de base */}
@@ -215,7 +220,11 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             {product.brand && (
               <Text style={styles.productBrand}>{product.brand}</Text>
             )}
-            <Text>*card*</Text>
+            {overall !== null ? (
+              <ScoreCard score={overall} variant="large" />
+            ) : (
+              <Text style={styles.noData}>Score non disponible</Text>
+            )}
           </View>
 
           <View style={styles.col}>
@@ -371,7 +380,7 @@ const styles = StyleSheet.create({
   },
   productBrand: {
     fontWeight: "500",
-    marginBottom: 4,
+    marginBottom: 8,
   },
   twoCols: {
     flexDirection: "row",

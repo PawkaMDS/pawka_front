@@ -6,6 +6,8 @@ import { getSearchHistory, SearchHistoryItem } from '@/lib/api/searchHistory';
 import { useRouter } from 'expo-router';
 import PageLayout from '@/components/layout/PageLayout';
 import { Colors } from '@/constants/theme';
+import { ScoreCard } from "@/components/ui/ScoreCard";
+import { getOverallScore } from "@/utils/score";
 
 export default function History() {
   const [items, setItems] = useState<SearchHistoryItem[]>([]);
@@ -24,7 +26,6 @@ export default function History() {
       year: "numeric",
     });
   };
-
 
   useEffect(() => {
     let mounted = true;
@@ -68,6 +69,8 @@ export default function History() {
             const product = item.product;
             const productId = product?.id ?? item.product_id;
             const isLast = index === items.length - 1;
+            // const productFood = product?.product_foods?.[0];
+            const overall = getOverallScore(product);
 
             return (
               <TouchableOpacity style={[styles.item, !isLast && styles.itemWithDivider]}
@@ -87,14 +90,18 @@ export default function History() {
                   <Heading as="h5" numberOfLines={2} style={styles.title}>
                     {product?.name ?? "Produit inconnu"}
                   </Heading>
-                  {!!product?.brand && (
-                    <Text style={styles.brand} numberOfLines={1}>
-                      {product.brand}
-                    </Text>
-                  )}
-                  <Text>
-                    *note*
-                  </Text>
+                  <View style={styles.col}>
+                    {product?.brand && <Text style={styles.brand} numberOfLines={1}>{product.brand}</Text>}
+
+                    <View >
+                      {overall !== null ? (
+                        <ScoreCard score={overall} variant="mini" />
+                      ) : (
+                        <Text>Score non disponible</Text>
+                      )}
+                    </View>
+                  </View>
+
                   {(() => {
                     const scanDate =
                       formatScanDate((item as any).createdAt) ??
@@ -169,6 +176,7 @@ const styles = StyleSheet.create({
   brand: {
     marginTop: 2,
     color: Colors.light.greyscale[60],
+    marginBottom: 16,
   },
 
   scanDate: {
