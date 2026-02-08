@@ -21,7 +21,7 @@ export function PageLayout({ children, style, contentStyle }: PageLayoutProps) {
 
 const styles = StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: Colors.light.supportBase },
-    container: { flex: 1, paddingHorizontal: 28, paddingTop: 5, justifyContent: 'flex-start', backgroundColor: Colors.light.supportBase },
+    container: { flex: 1, paddingHorizontal: 20, paddingTop: 5, justifyContent: 'flex-start', backgroundColor: Colors.light.supportBase },
 });
 
 export default PageLayout;
