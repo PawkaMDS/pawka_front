@@ -11,24 +11,20 @@ import {
   useCameraPermissions,
   BarcodeScanningResult,
 } from "expo-camera";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
 import { scanProductByEAN } from "@/lib/api/scan";
-import { ProductBottomSheet } from "@/components/ProductBottomSheet";
 
 export default function Scan() {
   const [permission, requestPermission] = useCameraPermissions();
-  const [scannedCode, setScannedCode] = useState<string | null>(null);
-  const [productId, setProductId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string>("");
   const lastScannedCodeRef = useRef<string | null>(null);
+  const router = useRouter();
 
   const reset = useCallback(() => {
     lastScannedCodeRef.current = null;
-    setScannedCode(null);
-    setProductId(null);
     setError(null);
     setIsLoading(false);
     setLoadingMessage("");
@@ -55,7 +51,6 @@ export default function Scan() {
     if (lastScannedCodeRef.current === code) return;
 
     lastScannedCodeRef.current = code;
-    setScannedCode(code);
     setError(null);
     setIsLoading(true);
     setLoadingMessage("Analyse du code-barres en cours...");
@@ -68,16 +63,19 @@ export default function Scan() {
       setIsLoading(false);
 
       if (result && result.id) {
-        setProductId(result.id);
+        router.push({
+          pathname: "/(tabs)/scan/_result",
+          params: { productId: String(result.id) },
+        });
+        // Reset pour permettre un nouveau scan au retour
+        lastScannedCodeRef.current = null;
       } else {
-        setProductId(null);
         setError(
           "Produit non trouvé. Veuillez réessayer avec un autre code-barres."
         );
       }
     } catch (e) {
       setIsLoading(false);
-      setProductId(null);
       const message = e instanceof Error ? e.message : String(e);
       setError(`Erreur lors de l'analyse: ${message}`);
     }
@@ -106,7 +104,7 @@ export default function Scan() {
   }
 
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.cameraContainer}>
         <CameraView
           style={StyleSheet.absoluteFill}
@@ -126,7 +124,7 @@ export default function Scan() {
           </View>
         </View>
 
-        {!productId && !error && !isLoading && (
+        {!error && !isLoading && (
           <View style={styles.hintContainer}>
             <Text style={styles.hint}>Scannez le code-barres d'un produit</Text>
           </View>
@@ -151,11 +149,7 @@ export default function Scan() {
           </View>
         )}
       </View>
-
-      {productId && (
-        <ProductBottomSheet productId={productId} onClose={reset} />
-      )}
-    </GestureHandlerRootView>
+    </View>
   );
 }
 
