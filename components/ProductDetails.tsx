@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
   },
   productBrand: {
     fontWeight: "500",
-    marginBottom: 8,
+    marginBottom: 18,
   },
   twoCols: {
     flexDirection: "row",

@@ -16,7 +16,7 @@ export function ScoreCard({ score, variant = "mini" }: Props) {
     if (variant === "mini") {
         return (
             <View style={[styles.miniPill, { backgroundColor: bg }]}>
-                <Text style={styles.miniText}>{s} /100</Text>
+                <Heading as="h6" style={styles.miniText}>{s} /100</Heading>
             </View>
         );
     }
@@ -27,9 +27,9 @@ export function ScoreCard({ score, variant = "mini" }: Props) {
         <View style={[styles.largeCard, { backgroundColor: bg }]}>
             <View style={styles.largeRow}>
                 <Heading as="h1" style={styles.largeScore}>{s}</Heading>
-                <Heading as="h4" style={styles.largeOutOf}>/100</Heading>
+                <Heading as="h6" style={styles.largeOutOf}>/100</Heading>
             </View>
-            <Text style={styles.largeLabel}>{label}</Text>
+            <Heading as="h6" style={styles.largeLabel}>{label}</Heading>
         </View>
     );
 }
@@ -37,18 +37,19 @@ export function ScoreCard({ score, variant = "mini" }: Props) {
 const styles = StyleSheet.create({
     // ===== MINI PILL =====
     miniPill: {
-        height: 30,
-        width: 90,
-        paddingHorizontal: 12,
-        borderRadius: 999,
+        // height: 30,
+        maxWidth: 88,
+        paddingHorizontal: 8,
+        paddingTop: 6,
+        paddingBottom: 4,
+        borderRadius: 12,
         alignItems: "center",
         justifyContent: "center",
     },
     miniText: {
         color: Colors.light.greyscale[0],
-        fontSize: 16,
-        fontWeight: "800",
-        lineHeight: 18,
+        // fontSize: 16,
+        lineHeight: 16,
     },
 
     // ===== LARGE CARD =====
@@ -58,7 +59,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         alignItems: "center",
         justifyContent: "center",
-        minHeight: 120,
     },
     largeRow: {
         flexDirection: "row",
@@ -69,7 +69,6 @@ const styles = StyleSheet.create({
     },
     largeOutOf: {
         fontSize: 18,
-        fontWeight: "700",
         marginBottom: 8,
         marginLeft: 6,
         color: Colors.light.greyscale[0],
@@ -78,7 +77,6 @@ const styles = StyleSheet.create({
     largeLabel: {
         marginTop: 5,
         fontSize: 18,
-        fontWeight: "700",
         color: Colors.light.greyscale[0],
     },
 });
