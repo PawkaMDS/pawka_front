@@ -8,42 +8,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { ProductDetails } from '@/components/ProductDetails';
 import PageLayout from '@/components/layout/PageLayout';
 
-/*
-const getAnimalIcon = (product: DetailedProduct): string => {
-    const animalTypeCode = product.product_foods?.[0]?.animal_type?.code;
-
-    switch (animalTypeCode) {
-        case 'cat':
-            return 'paw-outline';
-        case 'dog':
-            return 'paw';
-        case 'bird':
-            return 'leaf-outline';
-        case 'fish':
-            return 'water-outline';
-        case 'rodent':
-        case 'rabbit':
-            return 'paw-outline';
-        default:
-            return 'fast-food-outline';
-    }
-};
-
-const getOverallScore = (product?: DetailedProduct) => {
-    const productFood = product?.product_foods?.[0];
-    if (!productFood?.scores?.overall) return null;
-    return Math.round(productFood.scores.overall);
-};
-
-const getScoreColor = (score: number) => {
-    if (score >= 81) return '#2E7D32';
-    if (score >= 61) return '#689F38';
-    if (score >= 41) return '#F9A825';
-    if (score >= 21) return '#F57C00';
-    return '#D32F2F';
-};
-*/
-
 export default function ProductPage() {
     const params = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
@@ -79,11 +43,6 @@ export default function ProductPage() {
             mounted = false;
         };
     }, [params.id]);
-
-    /*
-    const overallScore = getOverallScore(product || undefined);
-    const scoreColor = overallScore ? getScoreColor(overallScore) : '#999';
-    */
 
     if (loading) {
         return (
