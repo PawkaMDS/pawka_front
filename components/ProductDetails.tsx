@@ -1,12 +1,18 @@
 import { View, StyleSheet, ScrollView, Image } from "react-native";
 import { Text } from "@/components/ui/Text";
 import { Accordion } from "@/components/Accordion";
-import { ScoreIndicator } from "@/components/ScoreIndicator";
 import type {
   DetailedProduct,
   ProductFood,
   AnalyticalComposition,
 } from "@/types/product";
+import { Heading } from "./ui/Heading";
+import { Colors } from "@/constants/theme";
+import { ScoreCard } from "@/components/ui/ScoreCard";
+import { getOverallScore } from "@/utils/score";
+import { ScoreCriteriaAccordionList } from "@/components/ui/ScoreCriteriaAccordionList";
+import IsVerified from "@/assets/icons/is-verified.svg";
+import Paws from "@/assets/icons/paws.svg";
 
 interface ProductDetailsProps {
   product: DetailedProduct;
@@ -201,39 +207,54 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     return sizes[size] || size;
   };
 
+  const overall = getOverallScore(product);
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* En-tête avec image et infos de base */}
       <View style={styles.header}>
-        {product.image_url && (
-          <Image
-            source={{ uri: product.image_url }}
-            style={styles.productImage}
-            resizeMode="contain"
-          />
-        )}
+        <Heading as="h4" style={styles.title}>
+          {product.name}
+        </Heading>
+        <View style={styles.twoCols}>
+          <View style={styles.col}>
+            {product.brand && (
+              <Text style={styles.productBrand}>{product.brand}</Text>
+            )}
+            {overall !== null ? (
+              <ScoreCard score={overall} variant="large" />
+            ) : (
+              <Text style={styles.noData}>Score non disponible</Text>
+            )}
+          </View>
 
-        <View style={styles.headerInfo}>
-          <Text style={styles.productName}>{product.name}</Text>
-          {product.brand && (
-            <Text style={styles.productBrand}>{product.brand}</Text>
-          )}
-          <Text style={styles.productEAN}>EAN: {product.code_ean}</Text>
-          {product.is_verified && (
-            <View style={styles.verifiedBadge}>
-              <Text style={styles.verifiedText}>Vérifié</Text>
-            </View>
-          )}
+          <View style={styles.col}>
+            {!!product.image_url && (
+              <Image
+                source={{ uri: product.image_url }}
+                style={styles.squareImage}
+                resizeMode="cover"
+              />
+            )}
+          </View>
         </View>
+
+        {product.is_verified && (
+          <View style={styles.headerVerified}>
+            <Heading as="h5">
+              Ce que disent nos experts
+            </Heading>
+            <Text>
+              Ce produit contient plusieurs ingrédients peu qualitatifs (sous-produits animaux, colorants, céréales en excès). Il peut convenir ponctuellement, mais n’est pas recommandé pour un usage quotidien, surtout chez les animaux sensibles ou stérilisés.
+            </Text>
+            <IsVerified width={98} height={98} style={styles.verifiedBadge} />
+            <Paws width={48} height={48} style={styles.paws} />
+          </View>
+        )}
       </View>
 
-      {/* Score global */}
-      {productFood?.scores?.overall !== undefined && (
-        <View style={styles.scoreSection}>
-          <Text style={styles.sectionTitle}>Score nutritionnel</Text>
-          <ScoreIndicator score={productFood.scores.overall} size="large" />
-        </View>
-      )}
+
+      <ScoreCriteriaAccordionList productFood={productFood} />
 
       {/* Accordéons */}
       <View style={styles.accordionsContainer}>
@@ -317,83 +338,119 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         {(productFood?.analyzed_at ||
           productFood?.sources ||
           productFood?.score_version) && (
-          <Accordion title="Informations complémentaires">
-            <View style={styles.infoContainer}>
-              {productFood.analyzed_at && (
-                <Text style={styles.infoText}>
-                  Analysé le:{" "}
-                  {new Date(productFood.analyzed_at).toLocaleDateString(
-                    "fr-FR"
-                  )}
-                </Text>
-              )}
-              {productFood.score_version && (
-                <Text style={styles.infoText}>
-                  Version du score: {productFood.score_version}
-                </Text>
-              )}
-              {productFood.sources && (
-                <Text style={styles.infoText}>
-                  Sources: {productFood.sources}
-                </Text>
-              )}
-            </View>
-          </Accordion>
-        )}
+            <Accordion title="Informations complémentaires">
+              <View style={styles.infoContainer}>
+                {productFood.analyzed_at && (
+                  <Text style={styles.infoText}>
+                    Analysé le:{" "}
+                    {new Date(productFood.analyzed_at).toLocaleDateString(
+                      "fr-FR"
+                    )}
+                  </Text>
+                )}
+                {productFood.score_version && (
+                  <Text style={styles.infoText}>
+                    Version du score: {productFood.score_version}
+                  </Text>
+                )}
+                {productFood.sources && (
+                  <Text style={styles.infoText}>
+                    Sources: {productFood.sources}
+                  </Text>
+                )}
+              </View>
+            </Accordion>
+          )}
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-  },
-  header: {
-    backgroundColor: "#fff",
-    padding: 20,
-    marginBottom: 16,
-  },
-  productImage: {
-    width: "100%",
-    height: 200,
-    marginBottom: 16,
-  },
-  headerInfo: {
-    gap: 8,
-  },
-  productName: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
+  title: {
+    marginTop: 4,
+    marginBottom: 12,
+    color: Colors.light.primary.base,
   },
   productBrand: {
-    fontSize: 18,
-    color: "#666",
     fontWeight: "500",
+    marginBottom: 18,
   },
-  productEAN: {
-    fontSize: 14,
-    color: "#888",
-    fontFamily: "monospace",
+  twoCols: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 16,
+  },
+  col: {
+    flex: 1,
+  },
+  squareImage: {
+    width: "100%",
+    aspectRatio: 1,
+    borderRadius: 12,
+  },
+  container: {
+    flex: 1,
+  },
+  header: {
+    marginBottom: 16,
+    marginTop: 28,
+  },
+  headerVerified: {
+    gap: 8,
+    backgroundColor: Colors.light.secondary.base,
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 12,
+    position: "relative",
+    overflow: "visible",
   },
   verifiedBadge: {
-    backgroundColor: "#E8F5E9",
+    position: "absolute",
+    top: -42,
+    right: -12,
+    zIndex: 10,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
     alignSelf: "flex-start",
     marginTop: 4,
   },
+  paws: {
+    position: "absolute",
+    bottom: -15,
+    left: -5,
+    zIndex: 10,
+  },
   verifiedText: {
     color: "#4CAF50",
     fontSize: 12,
     fontWeight: "600",
   },
+  criteriaBox: {
+    marginTop: 12,
+    backgroundColor: Colors.light.greyscale[0],
+    borderRadius: 12,
+    padding: 16,
+    gap: 12,
+  },
+
+  criteriaList: {
+    gap: 14,
+  },
+
+  criteriaRow: {
+    gap: 8,
+  },
+
+  criteriaLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: Colors.light.greyscale[80],
+  },
+
   scoreSection: {
     backgroundColor: "#fff",
-    padding: 20,
     marginBottom: 16,
     alignItems: "center",
   },
@@ -404,7 +461,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   accordionsContainer: {
-    padding: 16,
     paddingTop: 0,
   },
   ingredientsContainer: {

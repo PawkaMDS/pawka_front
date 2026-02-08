@@ -6,7 +6,7 @@ import { Colors } from "@/constants/theme";
 import { Text } from "@/components/ui/Text";
 import { FontFamilies } from "@/constants/typography";
 
-const HIDDEN = new Set(["scan/_result"]); // Hide technical routes
+const HIDDEN = new Set(["scan/_result", "product/[id]"]); // Hide technical routes
 
 export function PawkaTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     const insets = useSafeAreaInsets();
