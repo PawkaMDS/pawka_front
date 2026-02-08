@@ -1,154 +1,104 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
-  SafeAreaView,
 } from "react-native";
 import { Text } from "@/components/ui/Text";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { getProductById } from "@/lib/api/products";
 import { ProductDetails } from "@/components/ProductDetails";
+import PageLayout from "@/components/layout/PageLayout";
+import { Colors } from "@/constants/theme";
 import type { DetailedProduct } from "@/types/product";
 
 export default function ScanResult() {
-  const params = useLocalSearchParams<{ productId: string; token: string }>();
+  const params = useLocalSearchParams<{ productId: string }>();
   const router = useRouter();
   const [product, setProduct] = useState<DetailedProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadProduct = async () => {
-      if (!params.productId || !params.token) {
-        setError("Paramètres manquants");
-        setLoading(false);
+    let mounted = true;
+    (async () => {
+      const id = params.productId ? Number(params.productId) : NaN;
+      if (!id || Number.isNaN(id)) {
+        if (mounted) {
+          setError("Identifiant produit invalide");
+          setLoading(false);
+        }
         return;
       }
 
       try {
-        const data = await getProductById(
-          Number(params.productId),
-          params.token
-        );
-        if (data) {
-          setProduct(data);
-        } else {
-          setError("Produit non trouvé");
+        const data = await getProductById(id);
+        if (mounted) {
+          if (data) setProduct(data);
+          else setError("Produit introuvable");
         }
-      } catch (err) {
-        console.error("Erreur lors du chargement du produit:", err);
-        setError(err instanceof Error ? err.message : "Erreur inconnue");
+      } catch (err: any) {
+        if (mounted) setError(err?.message || "Erreur lors du chargement");
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
+    })();
+    return () => {
+      mounted = false;
     };
-
-    loadProduct();
-  }, [params.productId, params.token]);
-
-  const handleBack = () => {
-    router.back();
-  };
-
-  const handleScanAgain = () => {
-    router.push("/(tabs)/scan/scan");
-  };
+  }, [params.productId]);
 
   if (loading) {
     return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#0A7EA4" />
-        <Text style={styles.loadingText}>Chargement du produit...</Text>
-      </View>
+      <PageLayout>
+        <View style={styles.center}>
+          <ActivityIndicator />
+        </View>
+      </PageLayout>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.errorText}>{error}</Text>
-        <TouchableOpacity style={styles.button} onPress={handleBack}>
-          <Text style={styles.buttonText}>Retour</Text>
-        </TouchableOpacity>
-      </View>
+      <PageLayout>
+        <View style={styles.center}>
+          <Text>{error}</Text>
+        </View>
+      </PageLayout>
     );
   }
 
   if (!product) {
     return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.errorText}>Produit introuvable</Text>
-        <TouchableOpacity style={styles.button} onPress={handleScanAgain}>
-          <Text style={styles.buttonText}>Scanner un autre produit</Text>
-        </TouchableOpacity>
-      </View>
+      <PageLayout>
+        <View style={styles.center}>
+          <Text>Produit introuvable</Text>
+        </View>
+      </PageLayout>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Flèche de retour en haut à gauche */}
-      <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-        <Ionicons name="arrow-back" size={24} color="#333" />
+    <PageLayout>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={24} color={Colors.light.greyscale[90]} />
       </TouchableOpacity>
 
-      <ProductDetails product={product} />
-    </SafeAreaView>
+      <View style={styles.contentContainer}>
+        <ProductDetails product={product} />
+      </View>
+    </PageLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-  },
-  centerContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#F5F5F5",
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: "#666",
-  },
-  errorText: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-    marginBottom: 24,
-  },
-  button: {
-    backgroundColor: "#0A7EA4",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  contentContainer: { flex: 1 },
   backButton: {
-    position: "absolute",
-    top: 16,
-    left: 16,
-    zIndex: 10,
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
+    alignSelf: "flex-start",
+    marginBottom: 8,
+    padding: 4,
   },
 });
