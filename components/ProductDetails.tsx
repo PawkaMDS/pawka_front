@@ -1,7 +1,6 @@
 import { View, StyleSheet, ScrollView, Image } from "react-native";
 import { Text } from "@/components/ui/Text";
 import { Accordion } from "@/components/Accordion";
-import { ScoreIndicator } from "@/components/ScoreIndicator";
 import type {
   DetailedProduct,
   ProductFood,
@@ -11,7 +10,7 @@ import { Heading } from "./ui/Heading";
 import { Colors } from "@/constants/theme";
 import { ScoreCard } from "@/components/ui/ScoreCard";
 import { getOverallScore } from "@/utils/score";
-
+import { ScoreCriteriaAccordionList } from "@/components/ui/ScoreCriteriaAccordionList";
 
 interface ProductDetailsProps {
   product: DetailedProduct;
@@ -254,13 +253,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         </View>
       )}
 
-      {/* Score global */}
-      {productFood?.scores?.overall !== undefined && (
-        <View style={styles.scoreSection}>
-          <Text style={styles.sectionTitle}>Score nutritionnel</Text>
-          <ScoreIndicator score={productFood.scores.overall} size="large" />
-        </View>
-      )}
+      <ScoreCriteriaAccordionList productFood={productFood} />
 
       {/* Accordéons */}
       <View style={styles.accordionsContainer}>
@@ -344,29 +337,29 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         {(productFood?.analyzed_at ||
           productFood?.sources ||
           productFood?.score_version) && (
-          <Accordion title="Informations complémentaires">
-            <View style={styles.infoContainer}>
-              {productFood.analyzed_at && (
-                <Text style={styles.infoText}>
-                  Analysé le:{" "}
-                  {new Date(productFood.analyzed_at).toLocaleDateString(
-                    "fr-FR"
-                  )}
-                </Text>
-              )}
-              {productFood.score_version && (
-                <Text style={styles.infoText}>
-                  Version du score: {productFood.score_version}
-                </Text>
-              )}
-              {productFood.sources && (
-                <Text style={styles.infoText}>
-                  Sources: {productFood.sources}
-                </Text>
-              )}
-            </View>
-          </Accordion>
-        )}
+            <Accordion title="Informations complémentaires">
+              <View style={styles.infoContainer}>
+                {productFood.analyzed_at && (
+                  <Text style={styles.infoText}>
+                    Analysé le:{" "}
+                    {new Date(productFood.analyzed_at).toLocaleDateString(
+                      "fr-FR"
+                    )}
+                  </Text>
+                )}
+                {productFood.score_version && (
+                  <Text style={styles.infoText}>
+                    Version du score: {productFood.score_version}
+                  </Text>
+                )}
+                {productFood.sources && (
+                  <Text style={styles.infoText}>
+                    Sources: {productFood.sources}
+                  </Text>
+                )}
+              </View>
+            </Accordion>
+          )}
       </View>
     </ScrollView>
   );
@@ -422,6 +415,28 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
   },
+  criteriaBox: {
+    marginTop: 12,
+    backgroundColor: Colors.light.greyscale[0],
+    borderRadius: 12,
+    padding: 16,
+    gap: 12,
+  },
+
+  criteriaList: {
+    gap: 14,
+  },
+
+  criteriaRow: {
+    gap: 8,
+  },
+
+  criteriaLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: Colors.light.greyscale[80],
+  },
+
   scoreSection: {
     backgroundColor: "#fff",
     marginBottom: 16,
