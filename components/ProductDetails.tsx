@@ -11,6 +11,8 @@ import { Colors } from "@/constants/theme";
 import { ScoreCard } from "@/components/ui/ScoreCard";
 import { getOverallScore } from "@/utils/score";
 import { ScoreCriteriaAccordionList } from "@/components/ui/ScoreCriteriaAccordionList";
+import IsVerified from "@/assets/icons/is-verified.svg";
+import Paws from "@/assets/icons/paws.svg";
 
 interface ProductDetailsProps {
   product: DetailedProduct;
@@ -237,21 +239,20 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           </View>
         </View>
 
-        <View style={styles.headerVerified}>
-          <Heading as="h5">
-            Ce que disent nos experts
-          </Heading>
-          <Text>
-            Ce produit contient plusieurs ingrédients peu qualitatifs (sous-produits animaux, colorants, céréales en excès). Il peut convenir ponctuellement, mais n’est pas recommandé pour un usage quotidien, surtout chez les animaux sensibles ou stérilisés.
-          </Text>
-        </View>
+        {product.is_verified && (
+          <View style={styles.headerVerified}>
+            <Heading as="h5">
+              Ce que disent nos experts
+            </Heading>
+            <Text>
+              Ce produit contient plusieurs ingrédients peu qualitatifs (sous-produits animaux, colorants, céréales en excès). Il peut convenir ponctuellement, mais n’est pas recommandé pour un usage quotidien, surtout chez les animaux sensibles ou stérilisés.
+            </Text>
+            <IsVerified width={98} height={98} style={styles.verifiedBadge} />
+            <Paws width={48} height={48} style={styles.paws} />
+          </View>
+        )}
       </View>
 
-      {product.is_verified && (
-        <View style={styles.verifiedBadge}>
-          <Text style={styles.verifiedText}>Vérifié</Text>
-        </View>
-      )}
 
       <ScoreCriteriaAccordionList productFood={productFood} />
 
@@ -401,14 +402,25 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginTop: 12,
+    position: "relative",
+    overflow: "visible",
   },
   verifiedBadge: {
-    backgroundColor: "#E8F5E9",
+    position: "absolute",
+    top: -42,
+    right: -12,
+    zIndex: 10,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
     alignSelf: "flex-start",
     marginTop: 4,
+  },
+  paws: {
+    position: "absolute",
+    bottom: -15,
+    left: -5,
+    zIndex: 10,
   },
   verifiedText: {
     color: "#4CAF50",
