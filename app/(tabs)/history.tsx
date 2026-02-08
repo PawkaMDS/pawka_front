@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   },
 
   thumb: {
-    width: "100%",
+    width: "90%",
     aspectRatio: 1,
     borderRadius: 12,
     backgroundColor: Colors.light.greyscale[20],
