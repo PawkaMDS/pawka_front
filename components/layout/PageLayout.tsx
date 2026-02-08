@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/theme';
+
+const TAB_BAR_HEIGHT = 96;
 
 interface PageLayoutProps {
     children: React.ReactNode;
@@ -10,7 +12,8 @@ interface PageLayoutProps {
 }
 
 export function PageLayout({ children, style, contentStyle }: PageLayoutProps) {
-    const paddingBottom = 0;
+    const insets = useSafeAreaInsets();
+    const paddingBottom = TAB_BAR_HEIGHT + insets.bottom;
 
     return (
         <SafeAreaView style={[styles.safeArea, style]} edges={['top']}>
