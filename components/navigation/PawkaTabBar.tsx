@@ -92,9 +92,12 @@ export function PawkaTabBar({ state, descriptors, navigation }: BottomTabBarProp
 }
 
 const styles = StyleSheet.create({
-    // Outer -> fullscreen
+    // Outer -> fullscreen, absolute pour flotter au-dessus du contenu
     outer: {
-        width: "100%",
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
         backgroundColor: "transparent",
     },
 
