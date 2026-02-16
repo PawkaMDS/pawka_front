@@ -19,21 +19,14 @@ export default function ScreensLayout() {
         }}
       />
       
-      {/* Écran de chargement après onboarding */}
+      {/* Onboarding après inscription */}
       <Stack.Screen 
-        name="loading"
+        name="registerOnboarding"
         options={{
-          title: 'Chargement',
+          title: 'Inscription',
         }}
       />
       
-      {/* Écran de chargement après login */}
-      <Stack.Screen 
-        name="login-loading"
-        options={{
-          title: 'Connexion',
-        }}
-      />
     </Stack>
   );
 }

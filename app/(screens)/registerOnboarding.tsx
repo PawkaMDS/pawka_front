@@ -2,16 +2,12 @@ import { useState, useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import { Text } from "@/components/ui/Text";
 import { useRouter } from "expo-router";
-import Slider from "@/components/ui/Slider";
 import { Colors } from "@/constants/theme";
 import { FontFamilies } from "@/constants/typography";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withSequence,
-  Easing,
-} from "react-native-reanimated";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import Slider from "@/components/ui/Slider";
+
 
 // Données des 4 slides
 const SLIDES_DATA = [
@@ -56,16 +52,8 @@ export default function RegisterOnboardingScreen() {
   const [showAnimation, setShowAnimation] = useState(false);
   const [currentColorIndex, setCurrentColorIndex] = useState(0);
 
-  const scale = useSharedValue(1);
-
   useEffect(() => {
     if (showAnimation) {
-      // Animation de zoom de la patte
-      scale.value = withSequence(
-        withTiming(1, { duration: 0 }),
-        withTiming(50, { duration: 1500, easing: Easing.inOut(Easing.ease) })
-      );
-
       // Changement de couleur toutes les secondes
       const colorInterval = setInterval(() => {
         setCurrentColorIndex((prev) => {
@@ -74,6 +62,7 @@ export default function RegisterOnboardingScreen() {
             // Dernier changement de couleur (marron) = redirection
             clearInterval(colorInterval);
             setTimeout(() => {
+              AsyncStorage.removeItem("needsRegisterOnboarding");
               router.replace("/(tabs)/scan/scan");
             }, 1000); // Attendre 1 seconde sur la couleur marron avant de rediriger
             return prev;
@@ -85,10 +74,6 @@ export default function RegisterOnboardingScreen() {
       return () => clearInterval(colorInterval);
     }
   }, [showAnimation]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
 
   const handleSliderComplete = () => {
     setShowAnimation(true);
@@ -102,9 +87,9 @@ export default function RegisterOnboardingScreen() {
           { backgroundColor: COLOR_SEQUENCE[currentColorIndex] },
         ]}
       >
-        <Animated.View style={[styles.pawContainer, animatedStyle]}>
+        <View style={styles.pawContainer}>
           <Text style={styles.pawEmoji}>🐾</Text>
-        </Animated.View>
+        </View>
         <Text style={styles.brandName}>Pawka</Text>
       </View>
     );

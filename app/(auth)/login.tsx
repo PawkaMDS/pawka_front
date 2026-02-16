@@ -25,6 +25,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ONBOARDING_KEY = "hasSeenOnboarding";
+const REGISTER_ONBOARDING_KEY = "needsRegisterOnboarding";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -96,7 +97,9 @@ export default function LoginScreen() {
           email: email.trim(),
           password,
         });
+        await AsyncStorage.setItem(REGISTER_ONBOARDING_KEY, "1");
         setUser(result.user);
+        router.replace("/(screens)/registerOnboarding");
       
       }
     } catch (error) {
@@ -128,7 +131,6 @@ export default function LoginScreen() {
       {isLoading ? (
         <LoadingComponent
           title="Chargement en cours"
-          redirectTo="/(screens)/loading"
           duration={2500}
         />
       ) : (
