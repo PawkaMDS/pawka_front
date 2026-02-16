@@ -41,8 +41,8 @@ export default function Slider({ slides, onComplete }: SliderProps) {
   const handleNext = () => {
     if (currentIndex < slides.length - 1) {
       const nextIndex = currentIndex + 1;
-      flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
       setCurrentIndex(nextIndex);
+      flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
     } else {
       // Dernier slide, appeler onComplete
       onComplete?.();
@@ -52,8 +52,8 @@ export default function Slider({ slides, onComplete }: SliderProps) {
   const handlePrevious = () => {
     if (currentIndex > 0) {
       const prevIndex = currentIndex - 1;
-      flatListRef.current?.scrollToIndex({ index: prevIndex, animated: true });
       setCurrentIndex(prevIndex);
+      flatListRef.current?.scrollToIndex({ index: prevIndex, animated: true });
     }
   };
 
@@ -65,6 +65,8 @@ export default function Slider({ slides, onComplete }: SliderProps) {
         data={slides}
         horizontal
         pagingEnabled
+        scrollEnabled={true}
+        decelerationRate="fast"
         showsHorizontalScrollIndicator={false}
         onScroll={handleScroll}
         scrollEventThrottle={16}
