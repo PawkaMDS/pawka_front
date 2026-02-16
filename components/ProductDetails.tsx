@@ -1,3 +1,5 @@
+import React, { useMemo, useState } from "react";
+import { SegmentedTabs } from "@/components/ui/SegmentedTabs";
 import { View, StyleSheet, ScrollView, Image } from "react-native";
 import { Text } from "@/components/ui/Text";
 import { Accordion } from "@/components/Accordion";
@@ -13,6 +15,12 @@ import { getOverallScore } from "@/utils/score";
 import { ScoreCriteriaAccordionList } from "@/components/ui/ScoreCriteriaAccordionList";
 import IsVerified from "@/assets/icons/is-verified.svg";
 import Paws from "@/assets/icons/paws.svg";
+import DetailsIcon from "@/assets/icons/details.svg";
+import CompositionIcon from "@/assets/icons/composition.svg";
+import PawIcon from "@/assets/icons/paw2.svg";
+import Comment from "@/assets/icons/comment.svg";
+
+type ProductTabKey = "criteria" | "ingredients" | "animal" | "community";
 
 interface ProductDetailsProps {
   product: DetailedProduct;
@@ -23,6 +31,74 @@ interface ProductDetailsProps {
  */
 export function ProductDetails({ product }: ProductDetailsProps) {
   const productFood = product.product_foods?.[0]; // On prend le premier ProductFood
+
+  const [activeTab, setActiveTab] = useState<ProductTabKey>("criteria");
+
+  const tabs = useMemo(
+    () => [
+      {
+        key: "criteria" as const,
+        label: "Détails",
+        icon: (
+          <DetailsIcon
+            width={18}
+            height={18}
+            fill={
+              activeTab === "criteria"
+                ? Colors.light.primary.base
+                : Colors.light.secondary.base
+            }
+          />
+        ),
+      },
+      {
+        key: "ingredients" as const,
+        label: "Ingrédients",
+        icon: (
+          <CompositionIcon
+            width={18}
+            height={18}
+            fill={
+              activeTab === "ingredients"
+                ? Colors.light.primary.base
+                : Colors.light.secondary.base
+            }
+          />
+        ),
+      },
+      {
+        key: "animal" as const,
+        label: "Mon animal",
+        icon: (
+          <PawIcon
+            width={18}
+            height={18}
+            fill={
+              activeTab === "animal"
+                ? Colors.light.primary.base
+                : Colors.light.secondary.base
+            }
+          />
+        ),
+      },
+      {
+        key: "community" as const,
+        label: "Avis",
+        icon: (
+          <Comment
+            width={18}
+            height={18}
+            fill={
+              activeTab === "community"
+                ? Colors.light.primary.base
+                : Colors.light.secondary.base
+            }
+          />
+        ),
+      },
+    ],
+    [activeTab]
+  );
 
   // Fonction pour formater les ingrédients
   const formatIngredients = (ingredients?: string | null) => {
@@ -253,115 +329,77 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         )}
       </View>
 
+      <SegmentedTabs<ProductTabKey>
+        items={tabs}
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        showLabel={false}
+        style={styles.segmentedTabs}
+      />
 
-      <ScoreCriteriaAccordionList productFood={productFood} />
+      {activeTab === "criteria" && (
+        <>
+          <ScoreCriteriaAccordionList productFood={productFood} />
+        </>
+      )}
 
-      {/* Accordéons */}
-      <View style={styles.accordionsContainer}>
-        {/* Ingrédients */}
-        <Accordion title="Ingrédients" defaultExpanded={true}>
-          <View style={styles.ingredientsContainer}>
-            {formatIngredients(productFood?.ingredients)}
-          </View>
-        </Accordion>
-
-        {/* Composition analytique */}
-        <Accordion title="Composition analytique">
-          {renderAnalyticalComposition(productFood?.analytical_composition)}
-        </Accordion>
-
-        {/* Caractéristiques */}
-        <Accordion title="Caractéristiques">
-          {renderCharacteristics(productFood)}
-        </Accordion>
-
-        {/* Additifs et conformité */}
-        <Accordion title="Additifs et conformité">
-          {renderAdditives(productFood)}
-        </Accordion>
-
-        {/* Scores détaillés */}
-        {productFood?.scores && Object.keys(productFood.scores).length > 1 && (
-          <Accordion title="Scores détaillés">
-            <View style={styles.detailedScoresContainer}>
-              {productFood.scores.nutritional_quality !== undefined && (
-                <View style={styles.scoreRow}>
-                  <Text style={styles.scoreLabel}>Qualité nutritionnelle</Text>
-                  <Text style={styles.scoreValue}>
-                    {typeof productFood.scores.nutritional_quality === "object"
-                      ? (productFood.scores.nutritional_quality as any).pt
-                      : productFood.scores.nutritional_quality}
-                    /100
-                  </Text>
-                </View>
-              )}
-              {productFood.scores.ingredient_quality !== undefined && (
-                <View style={styles.scoreRow}>
-                  <Text style={styles.scoreLabel}>Qualité des ingrédients</Text>
-                  <Text style={styles.scoreValue}>
-                    {typeof productFood.scores.ingredient_quality === "object"
-                      ? (productFood.scores.ingredient_quality as any).pt
-                      : productFood.scores.ingredient_quality}
-                    /100
-                  </Text>
-                </View>
-              )}
-              {productFood.scores.processing_level !== undefined && (
-                <View style={styles.scoreRow}>
-                  <Text style={styles.scoreLabel}>
-                    Niveau de transformation
-                  </Text>
-                  <Text style={styles.scoreValue}>
-                    {typeof productFood.scores.processing_level === "object"
-                      ? (productFood.scores.processing_level as any).pt
-                      : productFood.scores.processing_level}
-                    /100
-                  </Text>
-                </View>
-              )}
-              {productFood.scores.additives_score !== undefined && (
-                <View style={styles.scoreRow}>
-                  <Text style={styles.scoreLabel}>Score additifs</Text>
-                  <Text style={styles.scoreValue}>
-                    {typeof productFood.scores.additives_score === "object"
-                      ? (productFood.scores.additives_score as any).pt
-                      : productFood.scores.additives_score}
-                    /100
-                  </Text>
-                </View>
-              )}
-            </View>
-          </Accordion>
-        )}
-
-        {/* Informations complémentaires */}
-        {(productFood?.analyzed_at ||
-          productFood?.sources ||
-          productFood?.score_version) && (
-            <Accordion title="Informations complémentaires">
-              <View style={styles.infoContainer}>
-                {productFood.analyzed_at && (
-                  <Text style={styles.infoText}>
-                    Analysé le:{" "}
-                    {new Date(productFood.analyzed_at).toLocaleDateString(
-                      "fr-FR"
-                    )}
-                  </Text>
-                )}
-                {productFood.score_version && (
-                  <Text style={styles.infoText}>
-                    Version du score: {productFood.score_version}
-                  </Text>
-                )}
-                {productFood.sources && (
-                  <Text style={styles.infoText}>
-                    Sources: {productFood.sources}
-                  </Text>
-                )}
+      {activeTab === "ingredients" && (
+        <View style={styles.placeholderView}>
+          <View style={styles.accordionsContainer}>
+            <Accordion title="Ingrédients" defaultExpanded={true}>
+              <View style={styles.ingredientsContainer}>
+                {formatIngredients(productFood?.ingredients)}
               </View>
             </Accordion>
-          )}
-      </View>
+
+            <Accordion title="Composition analytique">
+              {renderAnalyticalComposition(productFood?.analytical_composition)}
+            </Accordion>
+
+            <Accordion title="Caractéristiques">
+              {renderCharacteristics(productFood)}
+            </Accordion>
+
+            <Accordion title="Additifs et conformité">
+              {renderAdditives(productFood)}
+            </Accordion>
+
+            {(productFood?.analyzed_at || productFood?.sources || productFood?.score_version) && (
+              <Accordion title="Informations complémentaires">
+                <View style={styles.infoContainer}>
+                  {productFood.analyzed_at && (
+                    <Text style={styles.infoText}>
+                      Analysé le:{" "}
+                      {new Date(productFood.analyzed_at).toLocaleDateString("fr-FR")}
+                    </Text>
+                  )}
+                  {productFood.score_version && (
+                    <Text style={styles.infoText}>
+                      Version du score: {productFood.score_version}
+                    </Text>
+                  )}
+                  {productFood.sources && (
+                    <Text style={styles.infoText}>Sources: {productFood.sources}</Text>
+                  )}
+                </View>
+              </Accordion>
+            )}
+          </View>
+        </View>
+      )}
+
+      {activeTab === "animal" && (
+        <View style={styles.placeholderView}>
+          <Text>Vue 3 (Mon animal)</Text>
+        </View>
+      )}
+
+      {activeTab === "community" && (
+        <View style={styles.placeholderView}>
+          <Text>Vue 4 (Avis)</Text>
+        </View>
+      )}
+
     </ScrollView>
   );
 }
@@ -459,6 +497,17 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#333",
     marginBottom: 16,
+  },
+  segmented: {
+    marginTop: 12,
+    marginBottom: 16,
+  },
+
+  placeholderView: {
+    paddingVertical: 24,
+  },
+  segmentedTabs: {
+    marginTop: 12,
   },
   accordionsContainer: {
     paddingTop: 0,
