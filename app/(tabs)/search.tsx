@@ -19,7 +19,7 @@ import { searchProducts, ProductSearchResult } from '@/lib/api/products';
 import { ScoreCard } from '@/components/ui/ScoreCard';
 import { useRouter } from 'expo-router';
 import type { ProductType } from '@/types/product';
-import HierarchyIcon from '@/assets/icons/hierarchy.svg';
+import { getCategoryIcon } from '@/constants/categoryIcons';
 import ArrowRightIcon from '@/assets/icons/arrow-right.svg';
 import SearchIcon from '@/assets/icons/search.svg';
 
@@ -136,15 +136,18 @@ export default function Search() {
     setHasSearched(false);
   };
 
-  const renderCategoryItem = ({ item }: { item: ProductType }) => (
-    <TouchableOpacity style={styles.categoryItem} onPress={() => handleCategoryPress(item.code)}>
-      <View style={styles.categoryLeft}>
-        <HierarchyIcon width={20} height={20} fill={Colors.light.primary.base} />
-        <Text style={styles.categoryName}>{item.name}</Text>
-      </View>
-      <ArrowRightIcon width={14} height={14} fill={Colors.light.primary.base} />
-    </TouchableOpacity>
-  );
+  const renderCategoryItem = ({ item }: { item: ProductType }) => {
+    const CategoryIcon = getCategoryIcon(item.icon_name);
+    return (
+      <TouchableOpacity style={styles.categoryItem} onPress={() => handleCategoryPress(item.code)}>
+        <View style={styles.categoryLeft}>
+          <CategoryIcon width={20} height={20} fill={Colors.light.primary.base} />
+          <Text style={styles.categoryName}>{item.name}</Text>
+        </View>
+        <ArrowRightIcon width={14} height={14} fill={Colors.light.primary.base} />
+      </TouchableOpacity>
+    );
+  };
 
   const showResults = query.trim().length > 0 || activeTypeCode !== null;
   const activeCategoryName = activeTypeCode
