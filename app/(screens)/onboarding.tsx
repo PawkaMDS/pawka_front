@@ -18,6 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Colors } from "@/constants/theme";
 import { Typography } from "@/constants/typographyPresets";
 import { Button } from "@/components/ui/Button";
+import LoadingComponent from "@/components/layout/LoadingComponent";
 const { width, height } = Dimensions.get("window");
 
 /* SAFE AREAS */
@@ -53,6 +54,7 @@ const ONBOARDING_DATA = [
 export default function OnboardingScreen() {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
   /* AUTO SCROLL */
@@ -72,16 +74,26 @@ export default function OnboardingScreen() {
   }, []);
 
   const handleStart = async () => {
+    setIsLoading(true);
     try {
       await AsyncStorage.setItem(ONBOARDING_KEY, "true");
-      router.replace("/(screens)/loading");
+      // Le LoadingComponent redirigera automatiquement après son délai
     } catch {
-      router.replace("/(screens)/loading");
+      // Le LoadingComponent redirigera automatiquement même en cas d'erreur
     }
   };
 
   return (
-    <View style={styles.container}>
+    <>
+      {isLoading ? (
+        <LoadingComponent
+          title="Chargement en cours"
+          subtitle="Veuillez patienter..."
+          redirectTo="/(auth)/login"
+          duration={2500}
+        />
+      ) : (
+        <View style={styles.container}>
       {/* LOGO */}
       <View style={styles.logoContainer}>
         {/* Icône de patte stylisée comme sur l'image */}
@@ -156,7 +168,9 @@ export default function OnboardingScreen() {
         </View>
       </View>
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
-    </View>
+        </View>
+      )}
+    </>
   );
 }
 

@@ -20,7 +20,7 @@ function RootNavigation() {
     );
   }
   if (!isAuthenticated) {
-    return <Redirect href="/(auth)/welcome" />;
+    return <Redirect href="/(auth)/login" />;
   }
   return <Redirect href="/(tabs)/scan/scan" />;
 }
