@@ -6,7 +6,7 @@ export const getApiBaseUrl = (): string => {
   if (envUrl) return envUrl;
 
   //TODO mettre l'URL de production ici
-  return 'http://localhost:8081';
+  return 'http://192.168.1.21:8081';
 };
 
 export const API_BASE_URL = getApiBaseUrl();

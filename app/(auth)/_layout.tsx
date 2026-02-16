@@ -12,12 +12,6 @@ export default function AuthLayout() {
       }}
     >
       {/* Page de bienvenue - première page */}
-      <Stack.Screen 
-        name="welcome"
-        options={{
-          title: 'Bienvenue',
-        }}
-      />
       
       {/* Page de connexion */}
       <Stack.Screen 
@@ -27,13 +21,6 @@ export default function AuthLayout() {
         }}
       />
       
-      {/* Page d'inscription */}
-      <Stack.Screen 
-        name="register"
-        options={{
-          title: 'Inscription',
-        }}
-      />
     </Stack>
   );
 }
