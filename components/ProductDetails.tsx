@@ -337,69 +337,70 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         style={styles.segmentedTabs}
       />
 
-      {activeTab === "criteria" && (
-        <>
-          <ScoreCriteriaAccordionList productFood={productFood} />
-        </>
-      )}
+      <View style={styles.tabContentContainer}>
+        {activeTab === "criteria" && (
+          <>
+            <ScoreCriteriaAccordionList productFood={productFood} />
+          </>
+        )}
 
-      {activeTab === "ingredients" && (
-        <View style={styles.placeholderView}>
-          <View style={styles.accordionsContainer}>
-            <Accordion title="Ingrédients" defaultExpanded={true}>
-              <View style={styles.ingredientsContainer}>
-                {formatIngredients(productFood?.ingredients)}
-              </View>
-            </Accordion>
-
-            <Accordion title="Composition analytique">
-              {renderAnalyticalComposition(productFood?.analytical_composition)}
-            </Accordion>
-
-            <Accordion title="Caractéristiques">
-              {renderCharacteristics(productFood)}
-            </Accordion>
-
-            <Accordion title="Additifs et conformité">
-              {renderAdditives(productFood)}
-            </Accordion>
-
-            {(productFood?.analyzed_at || productFood?.sources || productFood?.score_version) && (
-              <Accordion title="Informations complémentaires">
-                <View style={styles.infoContainer}>
-                  {productFood.analyzed_at && (
-                    <Text style={styles.infoText}>
-                      Analysé le:{" "}
-                      {new Date(productFood.analyzed_at).toLocaleDateString("fr-FR")}
-                    </Text>
-                  )}
-                  {productFood.score_version && (
-                    <Text style={styles.infoText}>
-                      Version du score: {productFood.score_version}
-                    </Text>
-                  )}
-                  {productFood.sources && (
-                    <Text style={styles.infoText}>Sources: {productFood.sources}</Text>
-                  )}
+        {activeTab === "ingredients" && (
+          <View style={styles.placeholderView}>
+            <View style={styles.accordionsContainer}>
+              <Accordion title="Ingrédients" defaultExpanded={true}>
+                <View style={styles.ingredientsContainer}>
+                  {formatIngredients(productFood?.ingredients)}
                 </View>
               </Accordion>
-            )}
+
+              <Accordion title="Composition analytique">
+                {renderAnalyticalComposition(productFood?.analytical_composition)}
+              </Accordion>
+
+              <Accordion title="Caractéristiques">
+                {renderCharacteristics(productFood)}
+              </Accordion>
+
+              <Accordion title="Additifs et conformité">
+                {renderAdditives(productFood)}
+              </Accordion>
+
+              {(productFood?.analyzed_at || productFood?.sources || productFood?.score_version) && (
+                <Accordion title="Informations complémentaires">
+                  <View style={styles.infoContainer}>
+                    {productFood.analyzed_at && (
+                      <Text style={styles.infoText}>
+                        Analysé le:{" "}
+                        {new Date(productFood.analyzed_at).toLocaleDateString("fr-FR")}
+                      </Text>
+                    )}
+                    {productFood.score_version && (
+                      <Text style={styles.infoText}>
+                        Version du score: {productFood.score_version}
+                      </Text>
+                    )}
+                    {productFood.sources && (
+                      <Text style={styles.infoText}>Sources: {productFood.sources}</Text>
+                    )}
+                  </View>
+                </Accordion>
+              )}
+            </View>
           </View>
-        </View>
-      )}
+        )}
 
-      {activeTab === "animal" && (
-        <View style={styles.placeholderView}>
-          <Text>Vue 3 (Mon animal)</Text>
-        </View>
-      )}
+        {activeTab === "animal" && (
+          <View style={styles.placeholderView}>
+            <Text>Vue 3 (Mon animal)</Text>
+          </View>
+        )}
 
-      {activeTab === "community" && (
-        <View style={styles.placeholderView}>
-          <Text>Vue 4 (Avis)</Text>
-        </View>
-      )}
-
+        {activeTab === "community" && (
+          <View style={styles.placeholderView}>
+            <Text>Vue 4 (Avis)</Text>
+          </View>
+        )}
+      </View>
     </ScrollView>
   );
 }
@@ -508,6 +509,14 @@ const styles = StyleSheet.create({
   },
   segmentedTabs: {
     marginTop: 12,
+  },
+  tabContentContainer: {
+    backgroundColor: Colors.light.secondary[100],
+    marginTop: -24,
+    paddingTop: 20,
+    marginBottom: 30,
+    borderRadius: 12,
+    zIndex: 0,
   },
   accordionsContainer: {
     paddingTop: 0,
