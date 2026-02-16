@@ -3,7 +3,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  ActivityIndicator,
 } from "react-native";
 import { Text } from "@/components/ui/Text";
 import {
@@ -19,7 +18,6 @@ export default function Scan() {
   const [permission, requestPermission] = useCameraPermissions();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState<string>("");
   const lastScannedCodeRef = useRef<string | null>(null);
   const router = useRouter();
 
@@ -27,7 +25,6 @@ export default function Scan() {
     lastScannedCodeRef.current = null;
     setError(null);
     setIsLoading(false);
-    setLoadingMessage("");
   }, []);
 
   const onBarcodeScanned = useCallback(async (scan: BarcodeScanningResult) => {
@@ -53,7 +50,6 @@ export default function Scan() {
     lastScannedCodeRef.current = code;
     setError(null);
     setIsLoading(true);
-    setLoadingMessage("Analyse du code-barres en cours...");
 
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
@@ -112,7 +108,7 @@ export default function Scan() {
           barcodeScannerSettings={{
             barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"],
           }}
-          onBarcodeScanned={onBarcodeScanned}
+          onBarcodeScanned={isLoading ? undefined : onBarcodeScanned}
         />
 
         <View style={styles.overlay} pointerEvents="none">
@@ -127,16 +123,6 @@ export default function Scan() {
         {!error && !isLoading && (
           <View style={styles.hintContainer}>
             <Text style={styles.hint}>Scannez le code-barres d'un produit</Text>
-          </View>
-        )}
-
-        {isLoading && (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#fff" />
-            <Text style={styles.loadingText}>{loadingMessage}</Text>
-            <Text style={styles.loadingSubtext}>
-              Cela peut prendre quelques secondes...
-            </Text>
           </View>
         )}
 
@@ -215,29 +201,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#fff",
     fontSize: 14,
-  },
-  loadingContainer: {
-    position: "absolute",
-    bottom: 40,
-    left: 20,
-    right: 20,
-    backgroundColor: "rgba(0, 122, 255, 0.95)",
-    padding: 24,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  loadingText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-    textAlign: "center",
-    marginTop: 16,
-  },
-  loadingSubtext: {
-    color: "rgba(255, 255, 255, 0.8)",
-    fontSize: 13,
-    textAlign: "center",
-    marginTop: 8,
   },
   errorContainer: {
     position: "absolute",
