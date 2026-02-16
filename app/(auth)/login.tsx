@@ -99,6 +99,7 @@ export default function LoginScreen() {
         });
         await AsyncStorage.setItem(REGISTER_ONBOARDING_KEY, "1");
         setUser(result.user);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
         router.replace("/(screens)/registerOnboarding");
       
       }
@@ -131,7 +132,7 @@ export default function LoginScreen() {
       {isLoading ? (
         <LoadingComponent
           title="Chargement en cours"
-          duration={2500}
+          duration={2000}
         />
       ) : (
         <View style={styles.outerContainer}>

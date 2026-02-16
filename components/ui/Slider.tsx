@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  Image,
 } from "react-native";
 import { Text } from "@/components/ui/Text";
 import { Colors } from "@/constants/theme";
@@ -71,12 +72,20 @@ export default function Slider({ slides, onComplete }: SliderProps) {
         renderItem={({ item }) => (
           <View style={styles.slideContainer}>
             <View style={styles.slideContent}>
-              <View style={styles.imagePlaceholder}>
-                <Text style={styles.placeholderText}>📷</Text>
-                <Text style={styles.placeholderSubtext}>Image à venir</Text>
+              <View style={styles.imageContainer}>
+                {item.image ? (
+                  <Image
+                    source={item.image}
+                    style={styles.image}
+                    resizeMode="contain"
+                  />
+                ) : (
+                  <View style={styles.imagePlaceholder}>
+                    <Text style={styles.placeholderText}>📷</Text>
+                    <Text style={styles.placeholderSubtext}>Image à venir</Text>
+                  </View>
+                )}
               </View>
-              <Text style={styles.slideTitle}>{item.title}</Text>
-              <Text style={styles.slideDescription}>{item.description}</Text>
             </View>
           </View>
         )}
@@ -128,7 +137,7 @@ export default function Slider({ slides, onComplete }: SliderProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.supportBase,
+    backgroundColor: Colors.light.secondary.base,
   },
   slideContainer: {
     width,
@@ -139,10 +148,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 32,
   },
-  imagePlaceholder: {
+  imageContainer: {
     width: "100%",
     height: 300,
     marginBottom: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+  },
+  imagePlaceholder: {
+    width: "100%",
+    height: 300,
     backgroundColor: Colors.light.greyscale[20],
     borderRadius: 20,
     alignItems: "center",
@@ -159,20 +178,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamilies.text.regular,
     fontSize: FontSizes.bodyBase,
     color: Colors.light.greyscale[60],
-  },
-  slideTitle: {
-    fontFamily: FontFamilies.display.bold,
-    fontSize: 28,
-    color: Colors.light.primary[800],
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  slideDescription: {
-    fontFamily: FontFamilies.text.regular,
-    fontSize: FontSizes.bodyLarge,
-    color: Colors.light.greyscale[70],
-    textAlign: "center",
-    lineHeight: 24,
   },
 
   /* PAGINATION */
