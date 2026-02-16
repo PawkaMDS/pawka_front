@@ -3,7 +3,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  ActivityIndicator,
 } from "react-native";
 import { Text } from "@/components/ui/Text";
 import {
@@ -11,27 +10,21 @@ import {
   useCameraPermissions,
   BarcodeScanningResult,
 } from "expo-camera";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
 import { scanProductByEAN } from "@/lib/api/scan";
-import { ProductBottomSheet } from "@/components/ProductBottomSheet";
 
 export default function Scan() {
   const [permission, requestPermission] = useCameraPermissions();
-  const [scannedCode, setScannedCode] = useState<string | null>(null);
-  const [productId, setProductId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState<string>("");
   const lastScannedCodeRef = useRef<string | null>(null);
+  const router = useRouter();
 
   const reset = useCallback(() => {
     lastScannedCodeRef.current = null;
-    setScannedCode(null);
-    setProductId(null);
     setError(null);
     setIsLoading(false);
-    setLoadingMessage("");
   }, []);
 
   const onBarcodeScanned = useCallback(async (scan: BarcodeScanningResult) => {
@@ -55,10 +48,8 @@ export default function Scan() {
     if (lastScannedCodeRef.current === code) return;
 
     lastScannedCodeRef.current = code;
-    setScannedCode(code);
     setError(null);
     setIsLoading(true);
-    setLoadingMessage("Analyse du code-barres en cours...");
 
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
@@ -68,16 +59,19 @@ export default function Scan() {
       setIsLoading(false);
 
       if (result && result.id) {
-        setProductId(result.id);
+        router.push({
+          pathname: "/(tabs)/scan/_result",
+          params: { productId: String(result.id) },
+        });
+        // Reset pour permettre un nouveau scan au retour
+        lastScannedCodeRef.current = null;
       } else {
-        setProductId(null);
         setError(
           "Produit non trouvé. Veuillez réessayer avec un autre code-barres."
         );
       }
     } catch (e) {
       setIsLoading(false);
-      setProductId(null);
       const message = e instanceof Error ? e.message : String(e);
       setError(`Erreur lors de l'analyse: ${message}`);
     }
@@ -106,7 +100,7 @@ export default function Scan() {
   }
 
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.cameraContainer}>
         <CameraView
           style={StyleSheet.absoluteFill}
@@ -114,7 +108,7 @@ export default function Scan() {
           barcodeScannerSettings={{
             barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"],
           }}
-          onBarcodeScanned={onBarcodeScanned}
+          onBarcodeScanned={isLoading ? undefined : onBarcodeScanned}
         />
 
         <View style={styles.overlay} pointerEvents="none">
@@ -126,19 +120,9 @@ export default function Scan() {
           </View>
         </View>
 
-        {!productId && !error && !isLoading && (
+        {!error && !isLoading && (
           <View style={styles.hintContainer}>
             <Text style={styles.hint}>Scannez le code-barres d'un produit</Text>
-          </View>
-        )}
-
-        {isLoading && (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#fff" />
-            <Text style={styles.loadingText}>{loadingMessage}</Text>
-            <Text style={styles.loadingSubtext}>
-              Cela peut prendre quelques secondes...
-            </Text>
           </View>
         )}
 
@@ -151,11 +135,7 @@ export default function Scan() {
           </View>
         )}
       </View>
-
-      {productId && (
-        <ProductBottomSheet productId={productId} onClose={reset} />
-      )}
-    </GestureHandlerRootView>
+    </View>
   );
 }
 
@@ -221,29 +201,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#fff",
     fontSize: 14,
-  },
-  loadingContainer: {
-    position: "absolute",
-    bottom: 40,
-    left: 20,
-    right: 20,
-    backgroundColor: "rgba(0, 122, 255, 0.95)",
-    padding: 24,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  loadingText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-    textAlign: "center",
-    marginTop: 16,
-  },
-  loadingSubtext: {
-    color: "rgba(255, 255, 255, 0.8)",
-    fontSize: 13,
-    textAlign: "center",
-    marginTop: 8,
   },
   errorContainer: {
     position: "absolute",

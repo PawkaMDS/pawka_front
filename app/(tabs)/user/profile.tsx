@@ -1,12 +1,6 @@
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from "react-native";
+import { View, StyleSheet, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { Text } from "@/components/ui/Text";
-import { SafeAreaView } from "react-native-safe-area-context";
+import PageLayout from '@/components/layout/PageLayout';
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
@@ -33,27 +27,23 @@ export default function Profil() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <PageLayout>
         <Text style={styles.loadingText}>Chargement...</Text>
-      </SafeAreaView>
+      </PageLayout>
     );
   }
 
   if (!user) {
     return (
-      <SafeAreaView style={styles.container}>
+      <PageLayout>
         <Text style={styles.title}>Non connecté</Text>
         <Text style={styles.subtitle}>Veuillez vous connecter</Text>
-        <TouchableOpacity
-          style={styles.loginButton}
-          onPress={() => router.push("/")}
-        >
+        <TouchableOpacity style={styles.loginButton} onPress={() => router.push("/")}> 
           <Text style={styles.loginButtonText}>Se connecter</Text>
         </TouchableOpacity>
-      </SafeAreaView>
+      </PageLayout>
     );
   }
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("fr-FR", {
       day: "numeric",
@@ -63,7 +53,7 @@ export default function Profil() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+    <PageLayout>
       <ScrollView style={styles.container}>
         <View style={styles.header}>
           <View style={styles.avatarContainer}>
@@ -112,7 +102,7 @@ export default function Profil() {
           onPress={handleLogout}
         />
       </ScrollView>
-    </SafeAreaView>
+    </PageLayout>
   );
 }
 

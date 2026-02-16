@@ -14,13 +14,31 @@ export interface AnalyticalComposition {
 }
 
 // Interface pour les scores
+export interface ScoreDetail {
+  pt: number | null;
+  pct: number | null;
+  rationale: string;
+}
+
 export interface ProductScores {
-  overall?: number; // Score global sur 100
+  // ancien
+  overall?: number;
+
+  // nouveau format (scoring détaillé backend)
+  protein_content?: ScoreDetail;
+  fat_content?: ScoreDetail;
+  carbohydrate_content?: ScoreDetail;
+  fiber_content?: ScoreDetail;
+  ingredient_quality?: ScoreDetail;
+  protein_source_quality?: ScoreDetail;
+  byproducts_presence?: ScoreDetail;
+  chemical_additives?: ScoreDetail;
+  beneficial_additives?: ScoreDetail;
+
+  // si tu veux conserver d’anciens champs: (facultatif)
   nutritional_quality?: number;
-  ingredient_quality?: number;
   processing_level?: number;
   additives_score?: number;
-  [key: string]: number | undefined;
 }
 
 // Interface pour le type de produit
@@ -72,7 +90,7 @@ export interface ProductFood {
 
 // Interface principale pour un produit
 export interface Product {
-  id?: number;
+  id: number;
   code_ean: string;
   name: string;
   brand?: string | null;

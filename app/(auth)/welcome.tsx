@@ -11,7 +11,7 @@ export default function WelcomeScreen() {
   const handleViewOnboarding = async () => {
     try {
       await AsyncStorage.removeItem(ONBOARDING_KEY);
-      router.replace("/(screens)/onboarding_final");
+      router.replace("/(screens)/onboarding");
     } catch (error) {
       console.error("Error resetting onboarding:", error);
     }
@@ -62,12 +62,6 @@ export default function WelcomeScreen() {
         </TouchableOpacity> */}
       </View>
 
-      {/* Footer */}
-      <View style={styles.footer}>
-        <TouchableOpacity onPress={handleViewOnboarding} activeOpacity={0.7}>
-          <Text style={styles.footerLink}>Voir l'onboarding</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
@@ -141,6 +135,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 12,
     paddingVertical: 16,
+    marginBottom: 50,
     alignItems: "center",
     borderWidth: 2,
     borderColor: "#007AFF",
@@ -149,6 +144,7 @@ const styles = StyleSheet.create({
     color: "#007AFF",
     fontSize: 18,
     fontWeight: "600",
+
   },
   skipButton: {
     paddingVertical: 12,

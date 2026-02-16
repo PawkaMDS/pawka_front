@@ -150,7 +150,7 @@ export default function OnboardingScreen() {
           fullWidth
           icon={<ArrowRightIcon width={20} height={20} fill={Colors.light.supportBase} />}
           iconPosition="right"
-          containerStyle={{ margin: 20 }} // ✅ mêmes marges que l'ancien bouton
+          containerStyle={{ margin: 20 }} 
           onPress={handleStart}
         />
         </View>

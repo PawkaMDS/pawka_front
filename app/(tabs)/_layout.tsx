@@ -11,7 +11,11 @@ export default function TabsLayout() {
   return (
     <Tabs
       initialRouteName="search"
-      screenOptions={{ headerShown: false }}
+      screenOptions={{ 
+        headerShown: false,
+        tabBarStyle: { position: 'absolute', backgroundColor: 'transparent', elevation: 0, borderTopWidth: 0 },
+        sceneStyle: { backgroundColor: 'transparent' },
+      }}
       tabBar={(props) => <PawkaTabBar {...props} />}
     >
       <Tabs.Screen

@@ -1,10 +1,11 @@
 import { Slot, Redirect } from "expo-router";
 import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
-import { View, ActivityIndicator, Platform } from "react-native";
+import { View, ActivityIndicator, Platform, StatusBar } from "react-native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import * as NavigationBar from "expo-navigation-bar";
 import { useEffect } from "react";
+import * as SystemUI from "expo-system-ui";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -36,7 +37,9 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (Platform.OS === "android") {
+      StatusBar.setBarStyle("dark-content");
       NavigationBar.setButtonStyleAsync("dark");
+      SystemUI.setBackgroundColorAsync("#FAFAFAFF");
     }
   }, []);
 
