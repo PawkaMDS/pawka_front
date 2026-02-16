@@ -74,23 +74,20 @@ export function SegmentedTabs<K extends string>({
     );
 }
 
-const BAR_HEIGHT = 40;
-const ACTIVE_HEIGHT = 54;
-
 const styles = StyleSheet.create({
     wrap: {
         width: "100%",
-        height: BAR_HEIGHT,          // ✅ barre marron = 40
+        height: 40,          // ✅ barre marron = 40
         borderRadius: 999,
         flexDirection: "row",
         alignItems: "center",
-        paddingHorizontal: 6,
+        paddingHorizontal: 10,
         gap: 6,
     },
 
     item: {
         flex: 1,
-        height: BAR_HEIGHT,          // ✅ item normal = 40
+        height: 40,
         borderRadius: 999,
         alignItems: "center",
         justifyContent: "center",
@@ -100,8 +97,7 @@ const styles = StyleSheet.create({
     },
 
     itemActive: {
-        height: ACTIVE_HEIGHT,       // ✅ sélection = 54
-        marginTop: -Math.round((ACTIVE_HEIGHT - BAR_HEIGHT) / 2), // ✅ dépasse
+        height: 54,
         borderRadius: 999,
     },
 
@@ -111,7 +107,7 @@ const styles = StyleSheet.create({
     },
 
     label: {
-        fontSize: 14,
+        fontSize: 18,
         includeFontPadding: false,
     },
 });
