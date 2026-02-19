@@ -14,26 +14,18 @@ const SLIDES_DATA = [
   {
     id: "1",
     image: require("@/assets/images/onboarding/image1.png"),
-    title: "Welcome",
-    description: "Slide 1 description",
      },
   {
     id: "2",
     image: require("@/assets/images/onboarding/image2.png"),
-    title: "Explore",
-    description: "Slide 2 description",
   },
   {
     id: "3",
     image: require("@/assets/images/onboarding/image3.png"),
-    title: "Connect",
-    description: "Slide 3 description",
     },
   {
     id: "4",
     image: require("@/assets/images/onboarding/image4.png"),
-    title: "Get Started",
-    description: "Slide 4 description",
      },
 ];
 
