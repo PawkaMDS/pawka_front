@@ -22,17 +22,19 @@ import { Ionicons } from "@expo/vector-icons";
 import LoadingComponent from "@/components/layout/LoadingComponent";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SegmentedTabs } from "@/components/ui/SegmentedTabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ONBOARDING_KEY = "hasSeenOnboarding";
 const REGISTER_ONBOARDING_KEY = "needsRegisterOnboarding";
 
-export default function LoginScreen() {
+export default function LoginRegisterScreen() {
   const router = useRouter();
   const { setUser } = useAuth();
   const insets = useSafeAreaInsets();
 
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<"login" | "register">("login");
+  const isLogin = mode === "login";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -137,46 +139,18 @@ export default function LoginScreen() {
       ) : (
         <View style={styles.outerContainer}>
       <SafeAreaView style={styles.container} edges={["top"]}>
-        {/* Switch FIXE en haut */}
-        <View style={styles.switchWrapper}>
-        <View style={styles.switchContainer}>
-          <TouchableOpacity
-            style={[
-              styles.switchButton,
-              isLogin && styles.switchButtonActive,
+        {/* Tabs de sélection */}
+        <View style={styles.tabsWrapper}>
+          <SegmentedTabs
+            items={[
+              { key: "login", label: "Connexion" },
+              { key: "register", label: "Créer un compte" },
             ]}
-            onPress={() => setIsLogin(true)}
-            activeOpacity={0.8}
-          >
-            <Text
-              style={[
-                styles.switchText,
-                isLogin && styles.switchTextActive,
-              ]}
-            >
-              Connexion
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.switchButton,
-              !isLogin && styles.switchButtonActive,
-            ]}
-            onPress={() => setIsLogin(false)}
-            activeOpacity={0.8}
-          >
-            <Text
-              style={[
-                styles.switchText,
-                !isLogin && styles.switchTextActive,
-              ]}
-            >
-              Créer un compte
-            </Text>
-          </TouchableOpacity>
+            activeKey={mode}
+            onChange={(key) => setMode(key as "login" | "register")}
+            style={styles.segmentedTabs}
+          />
         </View>
-      </View>
 
       {/* Formulaire scrollable */}
       <KeyboardAvoidingView
@@ -342,44 +316,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
 
-  /* SWITCH FIXE EN HAUT */
-  switchWrapper: {
+  /* TABS */
+  tabsWrapper: {
     paddingTop: Platform.OS === "ios" ? 40 : 20,
     marginTop: 30,
     paddingBottom: 20,
     marginHorizontal: -20,
     paddingHorizontal: 20,
   },
-  switchContainer: {
-    flexDirection: "row",
-    backgroundColor: Colors.light.primary.base,
-    borderRadius: 30,
-    padding: 2,
-    height: 30,  
-    overflow: "visible", 
-  },
-  switchButton: {
-    flex: 1,
-    paddingVertical: 5,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 28,
-  },
-switchButtonActive: {
-    backgroundColor: Colors.light.secondary.base,
-    marginVertical: -9,  
-    paddingVertical: 10, 
-    elevation: 2,       
-
-},
-  switchText: {
-    fontFamily: FontFamilies.text.regular,
-    fontSize: FontSizes.bodyBase,
-    color: Colors.light.supportBase,
-  },
-  switchTextActive: {
-    fontFamily: FontFamilies.text.medium,
-    color: Colors.light.primary.base,
+  segmentedTabs: {
+    height: 40,
   },
 
   /* ZONE SCROLLABLE */

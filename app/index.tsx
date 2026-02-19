@@ -28,7 +28,7 @@ export default function Index() {
   }
 
   // Utilisateur non connecté → afficher la page de bienvenue
-  return <Redirect href="/(auth)/login" />;
+  return <Redirect href="/(auth)/loginRegister" />;
 }
 
 const styles = StyleSheet.create({
