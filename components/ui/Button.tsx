@@ -12,6 +12,16 @@ import {
 
 import { Colors } from "@/constants/theme";
 import { FontFamilies } from "@/constants/typography";
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { AuthProvider } from "@/lib/auth/AuthContext";
+import { useEffect } from "react";
+import { Platform } from "react-native";
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+import * as NavigationBar from "expo-navigation-bar";
+
+SplashScreen.preventAutoHideAsync();
 
 type ButtonVariant = "primary" | "secondary" | "simple";
 type IconPosition = "none" | "left" | "right";

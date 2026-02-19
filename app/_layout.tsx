@@ -4,15 +4,27 @@ import { View, ActivityIndicator, Platform, StatusBar } from "react-native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import * as NavigationBar from "expo-navigation-bar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import * as SystemUI from "expo-system-ui";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 SplashScreen.preventAutoHideAsync();
 
 function RootNavigation() {
   const { isLoading, isAuthenticated } = useAuth();
+  const [mustRegisterOnboard, setMustRegisterOnboard] = useState<
+    boolean | null
+  >(null);
 
-  if (isLoading) {
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      const value = await AsyncStorage.getItem("needsRegisterOnboarding");
+      setMustRegisterOnboard(value === "1");
+    };
+    checkOnboarding();
+  }, [isAuthenticated]);
+
+  if (isLoading || mustRegisterOnboard === null) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" />
@@ -20,7 +32,10 @@ function RootNavigation() {
     );
   }
   if (!isAuthenticated) {
-    return <Redirect href="/(auth)/welcome" />;
+    return <Redirect href="/(auth)/login" />;
+  }
+  if (mustRegisterOnboard) {
+    return <Redirect href="/(screens)/registerOnboarding" />;
   }
   return <Redirect href="/(tabs)/scan/scan" />;
 }

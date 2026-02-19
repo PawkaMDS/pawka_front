@@ -46,6 +46,7 @@ export interface ProductType {
   id: number;
   code: string;
   name: string;
+  icon_name?: string | null;
 }
 
 // Interface pour le type d'animal
@@ -82,7 +83,7 @@ export interface ProductFood {
   has_beneficial_additives?: boolean;
   sources?: string | null;
   score_version?: string | null;
-  
+
   // Relations
   animal_type?: AnimalType;
   food_type?: FoodType;
@@ -97,7 +98,7 @@ export interface Product {
   is_verified?: boolean;
   image_url?: string | null;
   type_id?: number;
-  
+
   // Relations
   type?: ProductType;
   product_foods?: ProductFood[];
