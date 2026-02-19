@@ -21,8 +21,8 @@ const { width } = Dimensions.get("window");
 export interface SlideData {
   id: string;
   image?: any;
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
 }
 
 interface SliderProps {
