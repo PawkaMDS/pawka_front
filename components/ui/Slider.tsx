@@ -8,6 +8,8 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
   Image,
+  ViewabilityConfig,
+  ViewToken,
 } from "react-native";
 import { Text } from "@/components/ui/Text";
 import { Colors } from "@/constants/theme";
@@ -31,18 +33,32 @@ interface SliderProps {
 export default function Slider({ slides, onComplete }: SliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
+  const [isScrolling, setIsScrolling] = useState(false);
 
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const scrollPosition = event.nativeEvent.contentOffset.x;
-    const index = Math.round(scrollPosition / width);
-    setCurrentIndex(index);
+  const viewabilityConfig: ViewabilityConfig = {
+    viewAreaCoveragePercentThreshold: 50,
+  };
+
+  const onViewableItemsChanged = ({
+    viewableItems,
+  }: {
+    viewableItems: ViewToken[];
+  }) => {
+    if (viewableItems.length > 0 && viewableItems[0].index !== null) {
+      setCurrentIndex(viewableItems[0].index);
+    }
   };
 
   const handleNext = () => {
     if (currentIndex < slides.length - 1) {
       const nextIndex = currentIndex + 1;
-      setCurrentIndex(nextIndex);
-      flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+      setIsScrolling(true);
+      flatListRef.current?.scrollToIndex({
+        index: nextIndex,
+        animated: true,
+      });
+      // Petit délai pour laisser l'animation se finir avant de refaire l'index
+      setTimeout(() => setIsScrolling(false), 300);
     } else {
       // Dernier slide, appeler onComplete
       onComplete?.();
@@ -52,8 +68,12 @@ export default function Slider({ slides, onComplete }: SliderProps) {
   const handlePrevious = () => {
     if (currentIndex > 0) {
       const prevIndex = currentIndex - 1;
-      setCurrentIndex(prevIndex);
-      flatListRef.current?.scrollToIndex({ index: prevIndex, animated: true });
+      setIsScrolling(true);
+      flatListRef.current?.scrollToIndex({
+        index: prevIndex,
+        animated: true,
+      });
+      setTimeout(() => setIsScrolling(false), 300);
     }
   };
 
@@ -68,7 +88,8 @@ export default function Slider({ slides, onComplete }: SliderProps) {
         scrollEnabled={true}
         decelerationRate="fast"
         showsHorizontalScrollIndicator={false}
-        onScroll={handleScroll}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
         scrollEventThrottle={16}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
@@ -87,6 +108,10 @@ export default function Slider({ slides, onComplete }: SliderProps) {
                     <Text style={styles.placeholderSubtext}>Image à venir</Text>
                   </View>
                 )}
+              </View>
+              <View style={styles.textContainer}>
+                <Text style={styles.title}>{item.title}</Text>
+                <Text style={styles.description}>{item.description}</Text>
               </View>
             </View>
           </View>
@@ -180,6 +205,23 @@ const styles = StyleSheet.create({
     fontFamily: FontFamilies.text.regular,
     fontSize: FontSizes.bodyBase,
     color: Colors.light.greyscale[60],
+  },
+  textContainer: {
+    alignItems: "center",
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  title: {
+    fontFamily: FontFamilies.display.bold,
+    fontSize: FontSizes.h3,
+    color: Colors.light.primary.base,
+    textAlign: "center",
+  },
+  description: {
+    fontFamily: FontFamilies.text.regular,
+    fontSize: FontSizes.bodyBase,
+    color: Colors.light.greyscale[70],
+    textAlign: "center",
   },
 
   /* PAGINATION */

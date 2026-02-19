@@ -99,9 +99,10 @@ export default function LoginRegisterScreen() {
           email: email.trim(),
           password,
         });
+        // Sauvegarder l'utilisateur temporairement
+        await AsyncStorage.setItem("tempRegisteredUser", JSON.stringify(result.user));
         await AsyncStorage.setItem(REGISTER_ONBOARDING_KEY, "1");
-        setUser(result.user);
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        // Rediriger vers registerOnboarding SANS appeler setUser
         router.replace("/(screens)/registerOnboarding");
       
       }
@@ -148,11 +149,11 @@ export default function LoginRegisterScreen() {
             ]}
             activeKey={mode}
             onChange={(key) => setMode(key as "login" | "register")}
+            compact={true}
             style={styles.segmentedTabs}
           />
         </View>
 
-      {/* Formulaire scrollable */}
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
