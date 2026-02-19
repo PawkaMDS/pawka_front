@@ -32,7 +32,7 @@ function RootNavigation() {
     );
   }
   if (!isAuthenticated) {
-    return <Redirect href="/(auth)/login" />;
+    return <Redirect href="/(auth)/loginRegister" />;
   }
   if (mustRegisterOnboard) {
     return <Redirect href="/(screens)/registerOnboarding" />;

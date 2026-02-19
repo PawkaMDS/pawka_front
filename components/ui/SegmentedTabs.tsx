@@ -17,6 +17,7 @@ type Props<K extends string> = {
 
     // ✅ new
     showLabel?: boolean;
+    compact?: boolean;
 
     style?: ViewStyle;
 };
@@ -26,6 +27,7 @@ export function SegmentedTabs<K extends string>({
     activeKey,
     onChange,
     showLabel = true,
+    compact = false,
     style,
 }: Props<K>) {
     const c = Colors.light;
@@ -58,6 +60,7 @@ export function SegmentedTabs<K extends string>({
                                 numberOfLines={1}
                                 style={[
                                     styles.label,
+                                    compact && styles.labelCompact,
                                     {
                                         fontFamily: FontFamilies.text.bold,
                                         color: active ? c.primary.base : c.secondary.base,
@@ -109,6 +112,10 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 18,
         includeFontPadding: false,
+    },
+
+    labelCompact: {
+        fontSize: 14,
     },
 });
 

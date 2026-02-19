@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { Colors } from "@/constants/theme";
 import { FontFamilies } from "@/constants/typography";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "@/lib/auth/AuthContext";
 
 import Slider from "@/components/ui/Slider";
 
@@ -13,30 +14,19 @@ const SLIDES_DATA = [
   {
     id: "1",
     image: require("@/assets/images/onboarding/image1.png"),
-    title: "Bienvenue sur Pawka",
-    description:
-      "Découvrez la meilleure façon de prendre soin de votre animal domestique",
-  },
+     },
   {
     id: "2",
     image: require("@/assets/images/onboarding/image2.png"),
-    title: "Scannez vos produits",
-    description:
-      "Analysez instantanément la composition et la qualité des produits pour vos animaux",
   },
   {
     id: "3",
     image: require("@/assets/images/onboarding/image3.png"),
-    title: "Suivez la santé",
-    description:
-      "Gardez un œil sur le bien-être et la santé de votre compagnon",
-  },
+    },
   {
     id: "4",
     image: require("@/assets/images/onboarding/image4.png"),
-    title: "Rejoignez la communauté",
-    description: "Partagez vos expériences avec d'autres propriétaires d'animaux",
-  },
+     },
 ];
 
 // Séquence de couleurs de la vidéo (en utilisant le thème)
@@ -48,6 +38,7 @@ const COLOR_SEQUENCE = [
 
 export default function RegisterOnboardingScreen() {
   const router = useRouter();
+  const { setUser } = useAuth();
   const [showLogoAnimation, setShowLogoAnimation] = useState(false);
   const [showColorAnimation, setShowColorAnimation] = useState(false);
   const [currentColorIndex, setCurrentColorIndex] = useState(0);
@@ -89,8 +80,17 @@ export default function RegisterOnboardingScreen() {
           if (nextIndex >= COLOR_SEQUENCE.length) {
             // Dernier changement de couleur (marron) = redirection
             clearInterval(colorInterval);
-            setTimeout(() => {
-              AsyncStorage.removeItem("needsRegisterOnboarding");
+            setTimeout(async () => {
+              // Charger l'utilisateur temporaire sauvegardé lors de l'inscription
+              const tempUserJson = await AsyncStorage.getItem("tempRegisteredUser");
+              if (tempUserJson) {
+                const tempUser = JSON.parse(tempUserJson);
+                await AsyncStorage.removeItem("tempRegisteredUser");
+                setUser(tempUser);
+              }
+              await AsyncStorage.removeItem("needsRegisterOnboarding");
+              // Petit délai supplémentaire pour assurer que le flag est bien retiré
+              await new Promise((resolve) => setTimeout(resolve, 200));
               router.replace("/(tabs)/scan/scan");
             }, 1000); // Attendre 1 seconde sur la couleur marron avant de rediriger
             return prev;

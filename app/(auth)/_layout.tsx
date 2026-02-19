@@ -13,9 +13,9 @@ export default function AuthLayout() {
     >
       {/* Page de bienvenue - première page */}
       
-      {/* Page de connexion */}
+      {/* Page de connexion/inscription */}
       <Stack.Screen 
-        name="login"
+        name="loginRegister"
         options={{
           title: 'Connexion',
         }}

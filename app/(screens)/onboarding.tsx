@@ -89,7 +89,7 @@ export default function OnboardingScreen() {
         <LoadingComponent
           title="Chargement en cours"
           subtitle="Veuillez patienter..."
-          redirectTo="/(auth)/login"
+          redirectTo="/(auth)/loginRegister"
           duration={2500}
         />
       ) : (
