@@ -83,6 +83,7 @@ export interface ProductFood {
   has_beneficial_additives?: boolean;
   sources?: string | null;
   score_version?: string | null;
+  total_score?: number | null;
 
   // Relations
   animal_type?: AnimalType;
