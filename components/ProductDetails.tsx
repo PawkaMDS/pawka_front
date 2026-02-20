@@ -13,7 +13,7 @@ import { Colors } from "@/constants/theme";
 import { ScoreCard } from "@/components/ui/ScoreCard";
 import { getOverallScore } from "@/utils/score";
 import { ScoreCriteriaAccordionList } from "@/components/ui/ScoreCriteriaAccordionList";
-import IsVerified from "@/assets/icons/is-verified.svg";
+import IsVerified from "@/assets/icons/label-pawka.svg";
 import Paws from "@/assets/icons/paws.svg";
 import DetailsIcon from "@/assets/icons/details.svg";
 import CompositionIcon from "@/assets/icons/composition.svg";
@@ -323,7 +323,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             <Text>
               Ce produit contient plusieurs ingrédients peu qualitatifs (sous-produits animaux, colorants, céréales en excès). Il peut convenir ponctuellement, mais n’est pas recommandé pour un usage quotidien, surtout chez les animaux sensibles ou stérilisés.
             </Text>
-            <IsVerified width={98} height={98} style={styles.verifiedBadge} />
+            <IsVerified width={74} height={74} style={styles.verifiedBadge} />
             <Paws width={48} height={48} style={styles.paws} />
           </View>
         )}
@@ -401,6 +401,9 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           </View>
         )}
       </View>
+      <Heading as="h5" style={{ marginBottom: 12, color: Colors.light.primary.base }}>
+        Alternatives plus saines
+      </Heading>
     </ScrollView>
   );
 }
@@ -440,14 +443,14 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.secondary.base,
     borderRadius: 12,
     padding: 16,
-    marginTop: 12,
+    marginTop: 18,
     position: "relative",
     overflow: "visible",
   },
   verifiedBadge: {
     position: "absolute",
     top: -42,
-    right: -12,
+    right: 0,
     zIndex: 10,
     paddingHorizontal: 12,
     paddingVertical: 6,
