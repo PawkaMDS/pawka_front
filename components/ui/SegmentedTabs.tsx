@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     },
 
     itemActive: {
-        height: 54,
+        height: 50,
         borderRadius: 999,
     },
 

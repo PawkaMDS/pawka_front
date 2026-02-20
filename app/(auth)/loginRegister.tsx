@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   segmentedTabs: {
-    height: 40,
+    height: 30,
   },
 
   /* ZONE SCROLLABLE */

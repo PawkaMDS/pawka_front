@@ -5,13 +5,12 @@ import {
   Dimensions,
   FlatList,
   TouchableOpacity,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
   Image,
   ViewabilityConfig,
   ViewToken,
 } from "react-native";
 import { Text } from "@/components/ui/Text";
+import ArrowRightIcon from "@/assets/icons/arrow-right.svg";
 import { Colors } from "@/constants/theme";
 import { FontFamilies, FontSizes } from "@/constants/typography";
 
@@ -23,6 +22,7 @@ export interface SlideData {
   image?: any;
   title?: string;
   description?: string;
+  descriptionStrong?: string;
 }
 
 interface SliderProps {
@@ -33,7 +33,6 @@ interface SliderProps {
 export default function Slider({ slides, onComplete }: SliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
-  const [isScrolling, setIsScrolling] = useState(false);
 
   const viewabilityConfig: ViewabilityConfig = {
     viewAreaCoveragePercentThreshold: 50,
@@ -52,30 +51,17 @@ export default function Slider({ slides, onComplete }: SliderProps) {
   const handleNext = () => {
     if (currentIndex < slides.length - 1) {
       const nextIndex = currentIndex + 1;
-      setIsScrolling(true);
       flatListRef.current?.scrollToIndex({
         index: nextIndex,
         animated: true,
       });
-      // Petit délai pour laisser l'animation se finir avant de refaire l'index
-      setTimeout(() => setIsScrolling(false), 300);
-    } else {
-      // Dernier slide, appeler onComplete
-      onComplete?.();
     }
   };
 
-  const handlePrevious = () => {
-    if (currentIndex > 0) {
-      const prevIndex = currentIndex - 1;
-      setIsScrolling(true);
-      flatListRef.current?.scrollToIndex({
-        index: prevIndex,
-        animated: true,
-      });
-      setTimeout(() => setIsScrolling(false), 300);
-    }
-  };
+  const isLastSlide = currentIndex === slides.length - 1;
+  const instructionText = isLastSlide
+    ? "Commencer mon premier scan"
+    : "Slider l'ecran pour continuer";
 
   return (
     <View style={styles.container}>
@@ -111,51 +97,57 @@ export default function Slider({ slides, onComplete }: SliderProps) {
               </View>
               <View style={styles.textContainer}>
                 <Text style={styles.title}>{item.title}</Text>
-                <Text style={styles.description}>{item.description}</Text>
+                <Text style={styles.description}>
+                  {item.description?.trimEnd()}
+                  {item.descriptionStrong ? (
+                    <Text style={styles.descriptionStrong}>
+                      {" "}
+                      {item.descriptionStrong}
+                    </Text>
+                  ) : null}
+                </Text>
               </View>
             </View>
           </View>
         )}
       />
 
-      {/* Navigation Dots */}
-      <View style={styles.pagination}>
-        {slides.map((_, index) => (
-          <View
-            key={index}
-            style={[
-              styles.dot,
-              index === currentIndex ? styles.dotActive : styles.dotInactive,
-            ]}
-          />
-        ))}
-      </View>
-
-      {/* Navigation Buttons */}
-      <View style={styles.navigation}>
-        {/* Bouton Précédent */}
-        {currentIndex > 0 && (
+      <View style={styles.guidanceContainer}>
+        {isLastSlide ? (
           <TouchableOpacity
-            style={styles.navButton}
-            onPress={handlePrevious}
+            onPress={onComplete}
             activeOpacity={0.8}
+            accessibilityRole="button"
           >
-            <Text style={styles.navButtonText}>← Précédent</Text>
+            <Text style={styles.guidanceTextAction}>{instructionText}</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.nextButtonRow}
+            onPress={handleNext}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel="Aller au prochain slide"
+          >
+            <Text style={styles.guidanceText}>{instructionText}</Text>
+            <ArrowRightIcon
+              width={18}
+              height={18}
+              fill={Colors.light.primary.base}
+            />
           </TouchableOpacity>
         )}
-
-        <View style={{ flex: 1 }} />
-
-        {/* Bouton Suivant / Terminer */}
-        <TouchableOpacity
-          style={[styles.navButton, styles.navButtonPrimary]}
-          onPress={handleNext}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.navButtonTextPrimary}>
-            {currentIndex === slides.length - 1 ? "Terminer" : "Suivant →"}
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.pagination}>
+          {slides.map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.dot,
+                index === currentIndex ? styles.dotActive : styles.dotInactive,
+              ]}
+            />
+          ))}
+        </View>
       </View>
     </View>
   );
@@ -177,14 +169,14 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: "100%",
-    height: 300,
-    marginBottom: 40,
+    height: 200,
+    marginBottom: 16,
     alignItems: "center",
     justifyContent: "center",
   },
   image: {
-    width: "100%",
-    height: "100%",
+    width: 177,
+    height: 177,
   },
   imagePlaceholder: {
     width: "100%",
@@ -209,6 +201,7 @@ const styles = StyleSheet.create({
   textContainer: {
     alignItems: "center",
     paddingHorizontal: 16,
+    minHeight: 190,
     gap: 12,
   },
   title: {
@@ -223,6 +216,35 @@ const styles = StyleSheet.create({
     color: Colors.light.greyscale[70],
     textAlign: "center",
   },
+  descriptionStrong: {
+    fontFamily: FontFamilies.text.bold,
+    fontSize: FontSizes.bodyBase,
+    color: Colors.light.greyscale[70],
+  },
+
+  /* GUIDANCE */
+  guidanceContainer: {
+    alignItems: "center",
+    paddingBottom: 40,
+    marginBottom: 100,
+    gap: 10,
+  },
+  nextButtonRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  guidanceText: {
+    fontFamily: FontFamilies.text.medium,
+    fontSize: 14,
+    color: Colors.light.greyscale[70],
+  },
+  guidanceTextAction: {
+    fontFamily: FontFamilies.text.medium,
+    fontSize: 14,
+    color: Colors.light.primary.base,
+    textDecorationLine: "underline",
+  },
 
   /* PAGINATION */
   pagination: {
@@ -230,7 +252,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 8,
-    paddingVertical: 20,
+    paddingTop: 6,
   },
   dot: {
     width: 8,
@@ -243,32 +265,5 @@ const styles = StyleSheet.create({
   },
   dotInactive: {
     backgroundColor: Colors.light.greyscale[30],
-  },
-
-  /* NAVIGATION */
-  navigation: {
-    flexDirection: "row",
-    paddingHorizontal: 32,
-    paddingBottom: 40,
-    gap: 16,
-  },
-  navButton: {
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    backgroundColor: Colors.light.greyscale[20],
-  },
-  navButtonPrimary: {
-    backgroundColor: Colors.light.primary.base,
-  },
-  navButtonText: {
-    fontFamily: FontFamilies.text.medium,
-    fontSize: 16,
-    color: Colors.light.greyscale[70],
-  },
-  navButtonTextPrimary: {
-    fontFamily: FontFamilies.text.medium,
-    fontSize: 16,
-    color: Colors.light.supportBase,
   },
 });
