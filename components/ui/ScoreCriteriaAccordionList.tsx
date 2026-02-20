@@ -1,11 +1,35 @@
 import React, { useMemo, useState } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
+import { View, StyleSheet, Pressable, Image } from "react-native";
 import { Text } from "@/components/ui/Text";
 import { Heading } from "@/components/ui/Heading";
 import { Colors } from "@/constants/theme";
 import { ScoreBar } from "@/components/ui/ScoreBar";
 import type { ProductFood, ProductScores, ScoreDetail } from "@/types/product";
 import Chevron from "@/assets/icons/chevron-left.svg";
+
+// Import des images des critères
+import ProteinContentImg from "@/assets/images/product/protein_content.png";
+import FatContentImg from "@/assets/images/product/fat_content.png";
+import CarbohydrateContentImg from "@/assets/images/product/carbohydrate_content.png";
+import FiberContentImg from "@/assets/images/product/fiber_content.png";
+import IngredientQualityImg from "@/assets/images/product/ingredient_quality.png";
+import ProteinSourceQualityImg from "@/assets/images/product/protein_source_quality.png";
+import ByproductsPresenceImg from "@/assets/images/product/byproducts_presence.png";
+import ChemicalAdditivesImg from "@/assets/images/product/chemical_additives.png";
+import BeneficialAdditivesImg from "@/assets/images/product/beneficial_additives.png";
+
+// Mapping des clés aux images
+const criterionImages: Record<string, any> = {
+    protein_content: ProteinContentImg,
+    fat_content: FatContentImg,
+    carbohydrate_content: CarbohydrateContentImg,
+    fiber_content: FiberContentImg,
+    ingredient_quality: IngredientQualityImg,
+    protein_source_quality: ProteinSourceQualityImg,
+    byproducts_presence: ByproductsPresenceImg,
+    chemical_additives: ChemicalAdditivesImg,
+    beneficial_additives: BeneficialAdditivesImg,
+};
 
 type Criterion = {
     key: keyof ProductScores;
@@ -78,8 +102,11 @@ export function ScoreCriteriaAccordionList({ productFood }: Props) {
                                     pressed && { opacity: 0.95 },
                                 ]}
                             >
-                                {/* Left icon placeholder */}
-                                <View style={styles.iconPlaceholder} />
+                                {/* Criterion image */}
+                                <Image
+                                    source={criterionImages[String(it.key)]}
+                                    style={styles.icon}
+                                />
 
                                 {/* Center content */}
                                 <View style={styles.center}>
@@ -150,6 +177,14 @@ const styles = StyleSheet.create({
         height: 60,
         borderRadius: 14,
         backgroundColor: Colors.light.greyscale[30],
+    },
+
+    icon: {
+        width: 60,
+        height: 60,
+        borderBottomLeftRadius: 12,
+        borderTopLeftRadius: 12,
+        resizeMode: "cover",
     },
 
     center: {
