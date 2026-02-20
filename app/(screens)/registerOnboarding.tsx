@@ -14,26 +14,41 @@ const SLIDES_DATA = [
   {
     id: "1",
     image: require("@/assets/images/onboarding/image1.png"),
-     },
+    title: "Bienvenue !",
+    description:
+      "Pawka est une application qui vous aide à choisir les meilleurs produits pour vos animaux.",
+  },
   {
     id: "2",
     image: require("@/assets/images/onboarding/image2.png"),
+    title: "Scannez un produit,\nobtenez une réponse claire",
+    description:
+      "Un code-barres, une seconde, une réponse,\ndirectement avec votre téléphone.",
+    descriptionStrong: "Pas besoin de décrypter l'étiquette.",
   },
   {
     id: "3",
     image: require("@/assets/images/onboarding/image3.png"),
-    },
+    title: "Un score, des détails,\nzéro jargon",
+    description:
+      "Pawka vous donne une note globale,\nmais aussi le détail : protéines, additifs, fibres, etc.",
+    descriptionStrong: "Pour que vous sachiez vraiment\nce que vous achetez.",
+  },
   {
     id: "4",
     image: require("@/assets/images/onboarding/image4.png"),
-     },
+    title: "Des alternatives saines et\npersonnalisées",
+    description:
+      "Si un produit n'est pas top, on vous propose mieux. Et si vous avez renseigné le profil de votre animal,les recommandations s'adaptent.",
+    descriptionStrong: "Simple. Sur. Et pensé pour iel.",
+  },
 ];
 
 // Séquence de couleurs de la vidéo (en utilisant le thème)
 const COLOR_SEQUENCE = [
+  Colors.light.primary.base, // Marron
   Colors.light.accent.base, // Vert
   Colors.light.secondary.base, // Jaune
-  Colors.light.primary.base, // Marron - dernier = redirection
 ];
 
 export default function RegisterOnboardingScreen() {
@@ -59,7 +74,7 @@ export default function RegisterOnboardingScreen() {
             useNativeDriver: true,
           }),
           Animated.timing(logoTranslateY, {
-            toValue: -900, // Lève encore plus l'image pour avoir le cousinet au centre
+            toValue: -3000, // Lève encore plus l'image pour avoir le cousinet au centre
             duration: 1800,
             useNativeDriver: true,
           }),
@@ -118,7 +133,19 @@ export default function RegisterOnboardingScreen() {
       >
         <View style={styles.pawContainer}>
         </View>
-        <Text style={styles.brandName}>Pawka</Text>
+        <Text
+          style={[
+            styles.brandName,
+            {
+              color:
+                currentColorIndex === 0
+                  ? Colors.light.supportBase
+                  : Colors.light.primary.base,
+            },
+          ]}
+        >
+          Pawka
+        </Text>
       </View>
     );
   }
