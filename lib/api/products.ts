@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { api } from '@/lib/api/client';
-import type { Product, DetailedProduct } from '@/types/product';
+import type { Product, DetailedProduct,Alternative } from '@/types/product';
 
 export interface ProductSearchResult {
   id: number;
@@ -73,3 +73,21 @@ export async function getProductById(id: number): Promise<DetailedProduct | null
     throw err as Error;
   }
 }
+
+export async function getAlternatives(productId: number): Promise<Alternative[]> {
+  try {
+    const res = await api.get<{ alternatives: Alternative[] }>(`/api/products/${productId}/alternatives`);
+    return res.data.alternatives;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status;
+      if (status === 404) return [];
+      if (status === 401) throw new Error('Non autorisé. Veuillez vous connecter.');
+      const body = err.response?.data as any;
+      const details = body?.message || body?.error || (typeof body === 'string' ? body : undefined) || err.message;
+      throw new Error(`API error ${status ?? 'unknown'} - ${details}`);
+    }
+    throw err as Error;
+  }
+}
+
