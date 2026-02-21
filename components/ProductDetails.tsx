@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import { SegmentedTabs } from "@/components/ui/SegmentedTabs";
 import { View, StyleSheet, ScrollView, Image } from "react-native";
 import { Text } from "@/components/ui/Text";
@@ -13,6 +13,7 @@ import { Colors } from "@/constants/theme";
 import { ScoreCard } from "@/components/ui/ScoreCard";
 import { getOverallScore } from "@/utils/score";
 import { ScoreCriteriaAccordionList } from "@/components/ui/ScoreCriteriaAccordionList";
+import { AlternativesSection } from "@/components/AlternativesSection";
 import IsVerified from "@/assets/icons/is-verified.svg";
 import Paws from "@/assets/icons/paws.svg";
 import DetailsIcon from "@/assets/icons/details.svg";
@@ -31,8 +32,14 @@ interface ProductDetailsProps {
  */
 export function ProductDetails({ product }: ProductDetailsProps) {
   const productFood = product.product_foods?.[0]; // On prend le premier ProductFood
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const [activeTab, setActiveTab] = useState<ProductTabKey>("criteria");
+
+  // Scroll en haut quand le produit change
+  useEffect(() => {
+    scrollViewRef.current?.scrollTo({ y: 0, animated: false });
+  }, [product.id]);
 
   const tabs = useMemo(
     () => [
@@ -286,7 +293,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   const overall = getOverallScore(product);
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView ref={scrollViewRef} style={styles.container} showsVerticalScrollIndicator={false}>
       {/* En-tête avec image et infos de base */}
       <View style={styles.header}>
         <Heading as="h4" style={styles.title}>
@@ -340,6 +347,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
       {activeTab === "criteria" && (
         <>
           <ScoreCriteriaAccordionList productFood={productFood} />
+          <AlternativesSection productId={product.id} />
         </>
       )}
 
