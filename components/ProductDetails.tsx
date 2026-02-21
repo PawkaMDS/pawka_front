@@ -1,6 +1,8 @@
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import { SegmentedTabs } from "@/components/ui/SegmentedTabs";
-import { View, StyleSheet, ScrollView, Image } from "react-native";
+import { View, StyleSheet, ScrollView, Image, TouchableOpacity } from "react-native";
+import { useLocalSearchParams, usePathname, useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { Text } from "@/components/ui/Text";
 import { Accordion } from "@/components/Accordion";
 import type {
@@ -33,6 +35,9 @@ interface ProductDetailsProps {
 export function ProductDetails({ product }: ProductDetailsProps) {
   const productFood = product.product_foods?.[0]; // On prend le premier ProductFood
   const scrollViewRef = useRef<ScrollView>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const localParams = useLocalSearchParams();
 
   const [activeTab, setActiveTab] = useState<ProductTabKey>("criteria");
 
@@ -106,6 +111,24 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     ],
     [activeTab]
   );
+
+  const returnTo = useMemo(() => {
+    const entries = Object.entries(localParams).flatMap(([key, value]) => {
+      if (value === undefined || value === null) return [];
+      if (Array.isArray(value)) {
+        return value.map((item) => [key, String(item)] as const);
+      }
+      return [[key, String(value)]] as const;
+    });
+
+    if (entries.length === 0) return pathname;
+
+    const query = entries
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join("&");
+
+    return `${pathname}?${query}`;
+  }, [localParams, pathname]);
 
   // Fonction pour formater les ingrédients
   const formatIngredients = (ingredients?: string | null) => {
@@ -348,6 +371,44 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         <>
           <ScoreCriteriaAccordionList productFood={productFood} />
           <AlternativesSection productId={product.id} />
+          
+          {/* Options Section */}
+          <View style={styles.optionsSection}>
+            <Heading as="h5" style={styles.optionsTitle}>Options</Heading>
+            
+            <TouchableOpacity style={styles.optionItem}>
+              <View style={styles.optionLeft}>
+                <Ionicons name="trash-outline" size={20} color={Colors.light.greyscale[90]} />
+                <Text style={styles.optionText}>Supprimer de l'historique</Text>
+              </View>
+            </TouchableOpacity>
+
+            <View style={styles.optionDivider} />
+
+            <TouchableOpacity 
+              style={styles.optionItem}
+              onPress={() =>
+                router.push({
+                  pathname: "/(screens)/howItWorks",
+                  params: { returnTo },
+                })
+              }
+            >
+              <View style={styles.optionLeft}>
+                <Text style={styles.optionText}>Méthode de notation</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={Colors.light.greyscale[90]} />
+            </TouchableOpacity>
+
+            <View style={styles.optionDivider} />
+
+            <TouchableOpacity style={styles.optionItem}>
+              <View style={styles.optionLeft}>
+                <Text style={styles.optionText}>Un problème avec ce produit</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={Colors.light.greyscale[90]} />
+            </TouchableOpacity>
+          </View>
         </>
       )}
 
@@ -631,5 +692,36 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
     lineHeight: 20,
+  },
+  optionsSection: {
+    backgroundColor: Colors.light.secondary.base,
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 24,
+    marginBottom: 24,
+  },
+  optionsTitle: {
+    color: Colors.light.primary.base,
+    marginBottom: 16,
+  },
+  optionItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+  },
+  optionLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  optionText: {
+    fontSize: 14,
+    color: Colors.light.greyscale[90],
+    fontWeight: "500",
+  },
+  optionDivider: {
+    height: 1,
+    backgroundColor: Colors.light.greyscale[30],
   },
 });
