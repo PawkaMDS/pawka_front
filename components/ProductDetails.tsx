@@ -101,14 +101,31 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   );
 
   // Fonction pour formater les ingrédients
-  const formatIngredients = (ingredients?: string | null) => {
-    if (!ingredients) return "Non disponible";
-    return ingredients.split(",").map((ing, index) => (
-      <Text key={index} style={styles.ingredient}>
-        • {ing.trim()}
-      </Text>
-    ));
+  const renderIngredientsList = (ingredients?: string | null) => {
+    if (!ingredients) return <Text style={styles.noData}>Non disponible</Text>;
+
+    const list = ingredients
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    return (
+      <View style={styles.ingredientsList}>
+        {list.map((ing, idx) => {
+          const isLast = idx === list.length - 1;
+          return (
+            <View
+              key={`${ing}-${idx}`}
+              style={[styles.ingredientRow, isLast && styles.ingredientRowLast]}
+            >
+              <Text style={styles.ingredientText}>{ing}</Text>
+            </View>
+          );
+        })}
+      </View>
+    );
   };
+
 
   // Fonction pour afficher la composition analytique
   const renderAnalyticalComposition = (
@@ -347,11 +364,11 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         {activeTab === "ingredients" && (
           <View style={styles.placeholderView}>
             <View style={styles.accordionsContainer}>
-              <Accordion title="Ingrédients" defaultExpanded={true}>
-                <View style={styles.ingredientsContainer}>
-                  {formatIngredients(productFood?.ingredients)}
-                </View>
-              </Accordion>
+              <Heading as="h5" style={styles.ingredientsTitle}>
+                Ingrédients
+              </Heading>
+
+              {renderIngredientsList(productFood?.ingredients)}
 
               <Accordion title="Composition analytique">
                 {renderAnalyticalComposition(productFood?.analytical_composition)}
@@ -524,14 +541,36 @@ const styles = StyleSheet.create({
   accordionsContainer: {
     paddingTop: 0,
   },
-  ingredientsContainer: {
-    gap: 8,
+  ingredientsTitle: {
+    marginBottom: 8,
+    color: Colors.light.primary.base,
   },
-  ingredient: {
+
+  ingredientsList: {
+    padding: 16,
+    backgroundColor: Colors.light.greyscale[0],
+    borderRadius: 12,
+    overflow: "hidden", // important pour que les bordures restent clean
+    marginBottom: 16,
+  },
+
+  ingredientRow: {
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.light.greyscale[20],
+  },
+
+  ingredientRowLast: {
+    borderBottomWidth: 0,
+  },
+
+  ingredientText: {
     fontSize: 14,
-    color: "#333",
-    lineHeight: 22,
+    color: Colors.light.greyscale[80],
+    lineHeight: 20,
   },
+
   noData: {
     fontSize: 14,
     color: "#999",
