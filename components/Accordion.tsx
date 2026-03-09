@@ -1,3 +1,4 @@
+import { Colors } from "@/constants/theme";
 import { useState } from "react";
 import {
   View,
@@ -62,11 +63,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fff",
     borderRadius: 12,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    marginBottom: 6,
     elevation: 2,
     overflow: "hidden",
   },
@@ -75,7 +72,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
-    backgroundColor: "#F5F5F5",
   },
   headerContent: {
     flexDirection: "row",
@@ -101,6 +97,8 @@ const styles = StyleSheet.create({
     transform: [{ rotate: "180deg" }],
   },
   content: {
+    borderTopColor: Colors.light.greyscale[20],
+    borderTopWidth: 1,
     padding: 16,
   },
 });

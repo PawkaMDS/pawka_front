@@ -384,10 +384,10 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         )}
 
         {activeTab === "ingredients" && (
-          <View style={styles.placeholderView}>
-            <View style={styles.accordionsContainer}>
+          <View>
+            <View style={styles.tabsContentWrapper}>
               {/* Titre visible + liste avec séparateurs (fichier 1) */}
-              <Heading as="h5" style={styles.ingredientsTitle}>
+              <Heading as="h5" style={styles.tabsHeading}>
                 Ingrédients
               </Heading>
 
@@ -430,14 +430,18 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         )}
 
         {activeTab === "animal" && (
-          <View style={styles.placeholderView}>
-            <Text>Vue 3 (Mon animal)</Text>
+          <View style={styles.tabsContentWrapper}>
+            <Heading as="h5" style={styles.tabsHeading}>
+              Mon animal
+            </Heading>
           </View>
         )}
 
         {activeTab === "community" && (
-          <View style={styles.placeholderView}>
-            <Text>Vue 4 (Avis)</Text>
+          <View style={styles.tabsContentWrapper}>
+            <Heading as="h5" style={styles.tabsHeading}>
+              Avis
+            </Heading>
           </View>
         )}
       </View>
@@ -579,9 +583,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 16,
   },
-  placeholderView: {
-    paddingVertical: 24,
-  },
   segmentedTabs: {
     marginTop: 12,
   },
@@ -594,25 +595,25 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     zIndex: 0,
   },
-  accordionsContainer: {
-    paddingTop: 0,
+  tabsContentWrapper: {
+    marginTop: 12,
+    marginBottom: 12,
+    backgroundColor: Colors.light.secondary[100],
+    borderRadius: 16,
+    padding: 16,
+    gap: 12,
   },
-  // Titre ingrédients visible au-dessus de la liste (fichier 1)
-  ingredientsTitle: {
-    marginBottom: 8,
+  tabsHeading: {
     color: Colors.light.primary.base,
   },
   // Liste d'ingrédients avec séparateurs (fichier 1)
   ingredientsList: {
-    padding: 16,
-    backgroundColor: Colors.light.greyscale[0],
     borderRadius: 12,
     overflow: "hidden",
     marginBottom: 16,
   },
   ingredientRow: {
     paddingVertical: 12,
-    paddingHorizontal: 14,
     borderBottomWidth: 1,
     borderBottomColor: Colors.light.greyscale[20],
   },
