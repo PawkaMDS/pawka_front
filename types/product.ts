@@ -77,6 +77,7 @@ export interface ProductFood {
   breed_size?: BreedSize | null;
   moisture_percent?: number | null;
   scores?: ProductScores | null;
+  total_score?: number | null;
   analyzed_at?: string | null;
   fediaf_conformity?: boolean;
   has_chemical_additives?: boolean;
@@ -109,3 +110,12 @@ export interface Product {
 export type DetailedProduct = Required<Pick<Product, 'id' | 'code_ean' | 'name'>> & Product & {
   product_foods: ProductFood[];
 };
+
+export interface Alternative {
+  id: number;
+  code_ean: string;
+  name: string;
+  brand?: string | null;
+  image: string | null;
+  score_total: number;
+}

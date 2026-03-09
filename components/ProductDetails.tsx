@@ -1,6 +1,8 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import { SegmentedTabs } from "@/components/ui/SegmentedTabs";
-import { View, StyleSheet, ScrollView, Image } from "react-native";
+import { View, StyleSheet, ScrollView, Image, TouchableOpacity } from "react-native";
+import { useLocalSearchParams, usePathname, useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { Text } from "@/components/ui/Text";
 import { Accordion } from "@/components/Accordion";
 import type {
@@ -31,8 +33,17 @@ interface ProductDetailsProps {
  */
 export function ProductDetails({ product }: ProductDetailsProps) {
   const productFood = product.product_foods?.[0]; // On prend le premier ProductFood
+  const scrollViewRef = useRef<ScrollView>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const localParams = useLocalSearchParams();
 
   const [activeTab, setActiveTab] = useState<ProductTabKey>("criteria");
+
+  // Scroll en haut quand le produit change
+  useEffect(() => {
+    scrollViewRef.current?.scrollTo({ y: 0, animated: false });
+  }, [product.id]);
 
   const tabs = useMemo(
     () => [
@@ -99,6 +110,24 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     ],
     [activeTab]
   );
+
+  const returnTo = useMemo(() => {
+    const entries = Object.entries(localParams).flatMap(([key, value]) => {
+      if (value === undefined || value === null) return [];
+      if (Array.isArray(value)) {
+        return value.map((item) => [key, String(item)] as const);
+      }
+      return [[key, String(value)]] as const;
+    });
+
+    if (entries.length === 0) return pathname;
+
+    const query = entries
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join("&");
+
+    return `${pathname}?${query}`;
+  }, [localParams, pathname]);
 
   // Fonction pour formater les ingrédients
   const renderIngredientsList = (ingredients?: string | null) => {
@@ -303,7 +332,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   const overall = getOverallScore(product);
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView ref={scrollViewRef} style={styles.container} showsVerticalScrollIndicator={false}>
       {/* En-tête avec image et infos de base */}
       <View style={styles.header}>
         <Heading as="h4" style={styles.title}>
@@ -674,5 +703,36 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
     lineHeight: 20,
+  },
+  optionsSection: {
+    backgroundColor: Colors.light.secondary.base,
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 24,
+    marginBottom: 24,
+  },
+  optionsTitle: {
+    color: Colors.light.primary.base,
+    marginBottom: 16,
+  },
+  optionItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+  },
+  optionLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  optionText: {
+    fontSize: 14,
+    color: Colors.light.greyscale[90],
+    fontWeight: "500",
+  },
+  optionDivider: {
+    height: 1,
+    backgroundColor: Colors.light.greyscale[30],
   },
 });
