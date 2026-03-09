@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   View,
   StyleSheet,
@@ -10,7 +10,7 @@ import { Text } from "@/components/ui/Text";
 import { Heading } from "@/components/ui/Heading";
 import { Colors } from "@/constants/theme";
 import { FontFamilies } from "@/constants/typography";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import IsVerified from "@/assets/icons/is-verified.svg";
 import IsVerifiedByIa from "@/assets/icons/is-verified-by-IA.svg";
@@ -106,6 +106,23 @@ const QUALITY_SCALE = [
 
 export default function HowItWorks() {
   const router = useRouter();
+  const { returnTo } = useLocalSearchParams<{ returnTo?: string | string[] }>();
+
+  const handleBack = useCallback(() => {
+    const resolvedReturnTo = Array.isArray(returnTo) ? returnTo[0] : returnTo;
+
+    if (resolvedReturnTo && resolvedReturnTo.trim().length > 0) {
+      router.replace(resolvedReturnTo as any);
+      return;
+    }
+
+    if (router.canGoBack()) {
+      router.back();
+      return;
+    }
+
+    router.replace("/(tabs)/search");
+  }, [returnTo, router]);
 
   return (
     <View style={styles.container}>
@@ -113,7 +130,7 @@ export default function HowItWorks() {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => router.back()}
+          onPress={handleBack}
         >
           <Ionicons name="arrow-back" size={20} color={Colors.light.primary.base} />
           <Text style={styles.backText}>Retour</Text>
