@@ -10,7 +10,7 @@ import { Text } from "@/components/ui/Text";
 import { Heading } from "@/components/ui/Heading";
 import { Colors } from "@/constants/theme";
 import { FontFamilies } from "@/constants/typography";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import IsVerified from "@/assets/icons/is-verified.svg";
 import IsVerifiedByIa from "@/assets/icons/is-verified-by-IA.svg";
@@ -106,19 +106,6 @@ const QUALITY_SCALE = [
 
 export default function HowItWorks() {
   const router = useRouter();
-  const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
-
-  const handleBack = () => {
-    if (typeof returnTo === "string" && returnTo.length > 0) {
-      router.replace(returnTo);
-      return;
-    }
-    if (router.canGoBack()) {
-      router.back();
-      return;
-    }
-    router.replace("/(tabs)/scan/scan");
-  };
 
   return (
     <View style={styles.container}>
@@ -126,7 +113,7 @@ export default function HowItWorks() {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={handleBack}
+          onPress={() => router.back()}
         >
           <Ionicons name="arrow-back" size={20} color={Colors.light.primary.base} />
           <Text style={styles.backText}>Retour</Text>
@@ -299,7 +286,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 24,
     paddingBottom: 24,
-    borderRadius: 16,
   },
   mainTitle: {
     color: Colors.light.primary.base,
@@ -418,9 +404,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamilies.text.regular,
   },
   labelsSection: {
-    backgroundColor: Colors.light.greyscale[0],
-    padding: 16,
-    borderRadius: 16,
     gap: 16,
   },
   labelCard: {
