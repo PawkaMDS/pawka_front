@@ -8,6 +8,7 @@ import PageLayout from '@/components/layout/PageLayout';
 import { Colors } from '@/constants/theme';
 import { ScoreCard } from "@/components/ui/ScoreCard";
 import { getOverallScore } from "@/utils/score";
+import Paws from "@/assets/icons/paws.svg";
 
 export default function History() {
   const [items, setItems] = useState<SearchHistoryItem[]>([]);
@@ -65,6 +66,20 @@ export default function History() {
             String(item.id ?? item.product?.id ?? item.product?.code_ean ?? index)
           }
           contentContainerStyle={{ paddingTop: 16 }}
+          ListFooterComponent={
+            <View style={styles.endSection}>
+              <View>
+                <Paws width={28} height={28} style={styles.endPaws} />
+                <Text style={styles.endText}>Et voilà, vous avez tout vu !</Text>
+                <Text style={styles.endText}>La suite s'écrit au prochain scan.</Text>
+              </View>
+              <Image
+                source={require("@/assets/images/catdog.png")}
+                style={styles.endDogImage}
+                resizeMode="contain"
+              />
+            </View>
+          }
           renderItem={({ item, index }) => {
             const product = item.product;
             const productId = product?.id ?? item.product_id;
@@ -169,7 +184,6 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    // tu peux ajuster si ton Heading h5 est trop grand/petit
     color: Colors.light.greyscale[90],
   },
 
@@ -183,5 +197,26 @@ const styles = StyleSheet.create({
     marginTop: 6,
     color: Colors.light.greyscale[50],
     fontSize: 12,
+  },
+
+  endSection: {
+    alignItems: 'center',
+    paddingTop: 32,
+    gap: 6,
+  },
+  endText: {
+    fontSize: 14,
+    color: Colors.light.greyscale[70],
+    textAlign: 'center',
+  },
+  endPaws: {
+    width: 28,
+    height: 28,
+    position: 'absolute',
+    left: -18,
+    top: 30,
+  },
+  endDogImage: {
+    width: '100%',
   },
 });
