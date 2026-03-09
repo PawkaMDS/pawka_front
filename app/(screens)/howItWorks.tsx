@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   View,
   StyleSheet,
@@ -106,19 +106,23 @@ const QUALITY_SCALE = [
 
 export default function HowItWorks() {
   const router = useRouter();
-  const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
+  const { returnTo } = useLocalSearchParams<{ returnTo?: string | string[] }>();
 
-  const handleBack = () => {
-    if (typeof returnTo === "string" && returnTo.length > 0) {
-      router.replace(returnTo);
+  const handleBack = useCallback(() => {
+    const resolvedReturnTo = Array.isArray(returnTo) ? returnTo[0] : returnTo;
+
+    if (resolvedReturnTo && resolvedReturnTo.trim().length > 0) {
+      router.replace(resolvedReturnTo as any);
       return;
     }
+
     if (router.canGoBack()) {
       router.back();
       return;
     }
-    router.replace("/(tabs)/scan/scan");
-  };
+
+    router.replace("/(tabs)/search");
+  }, [returnTo, router]);
 
   return (
     <View style={styles.container}>
@@ -299,7 +303,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 24,
     paddingBottom: 24,
-    borderRadius: 16,
   },
   mainTitle: {
     color: Colors.light.primary.base,
@@ -418,9 +421,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamilies.text.regular,
   },
   labelsSection: {
-    backgroundColor: Colors.light.greyscale[0],
-    padding: 16,
-    borderRadius: 16,
     gap: 16,
   },
   labelCard: {
