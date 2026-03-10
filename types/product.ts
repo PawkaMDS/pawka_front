@@ -77,7 +77,6 @@ export interface ProductFood {
   breed_size?: BreedSize | null;
   moisture_percent?: number | null;
   scores?: ProductScores | null;
-  total_score?: number | null;
   analyzed_at?: string | null;
   fediaf_conformity?: boolean;
   has_chemical_additives?: boolean;
@@ -98,6 +97,7 @@ export interface Product {
   name: string;
   brand?: string | null;
   is_verified?: boolean;
+  certification?: string | null;
   image_url?: string | null;
   type_id?: number;
 

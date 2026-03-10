@@ -361,7 +361,10 @@ export function ProductDetails({ product }: ProductDetailsProps) {
               Ce que disent nos experts
             </Heading>
             <Text>
-              Ce produit contient plusieurs ingrédients peu qualitatifs (sous-produits animaux, colorants, céréales en excès). Il peut convenir ponctuellement, mais n'est pas recommandé pour un usage quotidien, surtout chez les animaux sensibles ou stérilisés.
+              {
+                product.certification || 
+                "Ce produit contient plusieurs ingrédients peu qualitatifs (sous-produits animaux, colorants, céréales en excès). Il peut convenir ponctuellement, mais n'est pas recommandé pour un usage quotidien, surtout chez les animaux sensibles ou stérilisés."
+              }
             </Text>
             <IsVerified width={98} height={98} style={styles.verifiedBadge} />
             <Paws width={48} height={48} style={styles.paws} />
