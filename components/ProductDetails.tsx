@@ -16,6 +16,7 @@ import { ScoreCard } from "@/components/ui/ScoreCard";
 import { getOverallScore } from "@/utils/score";
 import { ScoreCriteriaAccordionList } from "@/components/ui/ScoreCriteriaAccordionList";
 import { AlternativesSection } from "@/components/AlternativesSection";
+import { AnimalSelector } from "@/components/product/AnimalSelector";
 import IsVerified from "@/assets/icons/is-verified.svg";
 import Paws from "@/assets/icons/paws.svg";
 import DetailsIcon from "@/assets/icons/details.svg";
@@ -437,6 +438,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             <Heading as="h5" style={styles.tabsHeading}>
               Mon animal
             </Heading>
+            <AnimalSelector />
           </View>
         )}
 
