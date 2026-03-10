@@ -106,7 +106,7 @@ export default function RegisterOnboardingScreen() {
               await AsyncStorage.removeItem("needsRegisterOnboarding");
               // Petit délai supplémentaire pour assurer que le flag est bien retiré
               await new Promise((resolve) => setTimeout(resolve, 200));
-              router.replace("/(tabs)/scan/scan");
+              router.replace("/(screens)/subscription");
             }, 1000); // Attendre 1 seconde sur la couleur marron avant de rediriger
             return prev;
           }
