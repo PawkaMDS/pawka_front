@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ActivityIndicator, Modal, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/theme';
 import { useAuth } from '@/lib/auth/AuthContext';
@@ -18,6 +19,7 @@ interface AnimalSelectorProps {
  * - Si premium avec animaux: affiche une liste déroulante
  */
 export function AnimalSelector({ onAnimalSelect }: AnimalSelectorProps) {
+    const router = useRouter();
     const { user } = useAuth();
     const [animals, setAnimals] = useState<Animal[]>([]);
     const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
@@ -68,6 +70,12 @@ export function AnimalSelector({ onAnimalSelect }: AnimalSelectorProps) {
                         Abonnez vous pour avoir un score personnalisé pour votre animal
                     </Text>
                 </View>
+                <TouchableOpacity
+                    style={styles.subscribeButton}
+                    onPress={() => router.push('/(screens)/subscription')}
+                >
+                    <Text style={styles.subscribeButtonText}>S'abonner</Text>
+                </TouchableOpacity>
             </View>
         );
     }
@@ -342,5 +350,18 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: Colors.light.greyscale[60],
         marginTop: 4,
+    },
+    subscribeButton: {
+        backgroundColor: Colors.light.primary.base,
+        borderRadius: 8,
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        alignItems: 'center',
+        marginTop: 12,
+    },
+    subscribeButtonText: {
+        color: Colors.light.greyscale[0],
+        fontSize: 14,
+        fontWeight: '600',
     },
 });
