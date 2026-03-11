@@ -16,6 +16,7 @@ import { ScoreCard } from "@/components/ui/ScoreCard";
 import { getOverallScore } from "@/utils/score";
 import { ScoreCriteriaAccordionList } from "@/components/ui/ScoreCriteriaAccordionList";
 import { AlternativesSection } from "@/components/AlternativesSection";
+import { AnimalSelector } from "@/components/product/AnimalSelector";
 import IsVerified from "@/assets/icons/is-verified.svg";
 import Paws from "@/assets/icons/paws.svg";
 import DetailsIcon from "@/assets/icons/details.svg";
@@ -33,7 +34,7 @@ interface ProductDetailsProps {
  * Composant pour afficher tous les détails d'un produit avec accordéons
  */
 export function ProductDetails({ product }: ProductDetailsProps) {
-  const productFood = product.product_foods?.[0]; // On prend le premier ProductFood
+  const productFood = product.product_foods?.[0];
   const scrollViewRef = useRef<ScrollView>(null);
   const router = useRouter();
   const pathname = usePathname();
@@ -41,7 +42,6 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
   const [activeTab, setActiveTab] = useState<ProductTabKey>("criteria");
 
-  // Scroll en haut quand le produit change
   useEffect(() => {
     scrollViewRef.current?.scrollTo({ y: 0, animated: false });
   }, [product.id]);
@@ -130,17 +130,32 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     return `${pathname}?${query}`;
   }, [localParams, pathname]);
 
-  // Fonction pour formater les ingrédients
-  const formatIngredients = (ingredients?: string | null) => {
-    if (!ingredients) return "Non disponible";
-    return ingredients.split(",").map((ing, index) => (
-      <Text key={index} style={styles.ingredient}>
-        • {ing.trim()}
-      </Text>
-    ));
+  // Liste d'ingrédients avec style séparateurs (fichier 1)
+  const renderIngredientsList = (ingredients?: string | null) => {
+    if (!ingredients) return <Text style={styles.noData}>Non disponible</Text>;
+
+    const list = ingredients
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    return (
+      <View style={styles.ingredientsList}>
+        {list.map((ing, idx) => {
+          const isLast = idx === list.length - 1;
+          return (
+            <View
+              key={`${ing}-${idx}`}
+              style={[styles.ingredientRow, isLast && styles.ingredientRowLast]}
+            >
+              <Text style={styles.ingredientText}>{ing}</Text>
+            </View>
+          );
+        })}
+      </View>
+    );
   };
 
-  // Fonction pour afficher la composition analytique
   const renderAnalyticalComposition = (
     composition?: AnalyticalComposition | null
   ) => {
@@ -158,7 +173,6 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     );
   };
 
-  // Fonction pour formater les labels
   const formatLabel = (key: string): string => {
     const labels: Record<string, string> = {
       proteins: "Protéines",
@@ -171,7 +185,6 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     return labels[key] || key;
   };
 
-  // Fonction pour afficher les caractéristiques
   const renderCharacteristics = (pf?: ProductFood) => {
     if (!pf) return <Text style={styles.noData}>Non disponible</Text>;
 
@@ -232,7 +245,6 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     );
   };
 
-  // Fonction pour afficher les additifs
   const renderAdditives = (pf?: ProductFood) => {
     if (!pf) return <Text style={styles.noData}>Non disponible</Text>;
 
@@ -291,7 +303,6 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     );
   };
 
-  // Helpers pour formater les énumérations
   const formatLifeStage = (stage: string): string => {
     const stages: Record<string, string> = {
       puppy: "Chiot",
@@ -317,7 +328,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
   return (
     <ScrollView ref={scrollViewRef} style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* En-tête avec image et infos de base */}
+      {/* En-tête */}
       <View style={styles.header}>
         <Heading as="h4" style={styles.title}>
           {product.name}
@@ -351,7 +362,10 @@ export function ProductDetails({ product }: ProductDetailsProps) {
               Ce que disent nos experts
             </Heading>
             <Text>
-              Ce produit contient plusieurs ingrédients peu qualitatifs (sous-produits animaux, colorants, céréales en excès). Il peut convenir ponctuellement, mais n’est pas recommandé pour un usage quotidien, surtout chez les animaux sensibles ou stérilisés.
+              {
+                product.certification || 
+                "Ce produit contient plusieurs ingrédients peu qualitatifs (sous-produits animaux, colorants, céréales en excès). Il peut convenir ponctuellement, mais n'est pas recommandé pour un usage quotidien, surtout chez les animaux sensibles ou stérilisés."
+              }
             </Text>
             <IsVerified width={98} height={98} style={styles.verifiedBadge} />
             <Paws width={48} height={48} style={styles.paws} />
@@ -367,108 +381,115 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         style={styles.segmentedTabs}
       />
 
-      {activeTab === "criteria" && (
-        <>
+      {/* Fond coloré englobant tout le contenu des tabs (fichier 1) */}
+      <View style={styles.tabContentContainer}>
+        {activeTab === "criteria" && (
           <ScoreCriteriaAccordionList productFood={productFood} />
-          <AlternativesSection productId={product.id} />
-          
-          {/* Options Section */}
-          <View style={styles.optionsSection}>
-            <Heading as="h5" style={styles.optionsTitle}>Options</Heading>
-            
-            <TouchableOpacity style={styles.optionItem}>
-              <View style={styles.optionLeft}>
-                <Ionicons name="trash-outline" size={20} color={Colors.light.greyscale[90]} />
-                <Text style={styles.optionText}>Supprimer de l'historique</Text>
-              </View>
-            </TouchableOpacity>
+        )}
 
-            <View style={styles.optionDivider} />
+        {activeTab === "ingredients" && (
+          <View>
+            <View style={styles.tabsContentWrapper}>
+              {/* Titre visible + liste avec séparateurs (fichier 1) */}
+              <Heading as="h5" style={styles.tabsHeading}>
+                Ingrédients
+              </Heading>
 
-            <TouchableOpacity 
-              style={styles.optionItem}
-              onPress={() =>
-                router.push({
-                  pathname: "/(screens)/howItWorks",
-                  params: { returnTo },
-                })
-              }
-            >
-              <View style={styles.optionLeft}>
-                <Text style={styles.optionText}>Méthode de notation</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={Colors.light.greyscale[90]} />
-            </TouchableOpacity>
+              {renderIngredientsList(productFood?.ingredients)}
 
-            <View style={styles.optionDivider} />
-
-            <TouchableOpacity style={styles.optionItem}>
-              <View style={styles.optionLeft}>
-                <Text style={styles.optionText}>Un problème avec ce produit</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={Colors.light.greyscale[90]} />
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
-
-      {activeTab === "ingredients" && (
-        <View style={styles.placeholderView}>
-          <View style={styles.accordionsContainer}>
-            <Accordion title="Ingrédients" defaultExpanded={true}>
-              <View style={styles.ingredientsContainer}>
-                {formatIngredients(productFood?.ingredients)}
-              </View>
-            </Accordion>
-
-            <Accordion title="Composition analytique">
-              {renderAnalyticalComposition(productFood?.analytical_composition)}
-            </Accordion>
-
-            <Accordion title="Caractéristiques">
-              {renderCharacteristics(productFood)}
-            </Accordion>
-
-            <Accordion title="Additifs et conformité">
-              {renderAdditives(productFood)}
-            </Accordion>
-
-            {(productFood?.analyzed_at || productFood?.sources || productFood?.score_version) && (
-              <Accordion title="Informations complémentaires">
-                <View style={styles.infoContainer}>
-                  {productFood.analyzed_at && (
-                    <Text style={styles.infoText}>
-                      Analysé le:{" "}
-                      {new Date(productFood.analyzed_at).toLocaleDateString("fr-FR")}
-                    </Text>
-                  )}
-                  {productFood.score_version && (
-                    <Text style={styles.infoText}>
-                      Version du score: {productFood.score_version}
-                    </Text>
-                  )}
-                  {productFood.sources && (
-                    <Text style={styles.infoText}>Sources: {productFood.sources}</Text>
-                  )}
-                </View>
+              <Accordion title="Composition analytique">
+                {renderAnalyticalComposition(productFood?.analytical_composition)}
               </Accordion>
-            )}
+
+              <Accordion title="Caractéristiques">
+                {renderCharacteristics(productFood)}
+              </Accordion>
+
+              <Accordion title="Additifs et conformité">
+                {renderAdditives(productFood)}
+              </Accordion>
+
+              {(productFood?.analyzed_at || productFood?.sources || productFood?.score_version) && (
+                <Accordion title="Informations complémentaires">
+                  <View style={styles.infoContainer}>
+                    {productFood.analyzed_at && (
+                      <Text style={styles.infoText}>
+                        Analysé le:{" "}
+                        {new Date(productFood.analyzed_at).toLocaleDateString("fr-FR")}
+                      </Text>
+                    )}
+                    {productFood.score_version && (
+                      <Text style={styles.infoText}>
+                        Version du score: {productFood.score_version}
+                      </Text>
+                    )}
+                    {productFood.sources && (
+                      <Text style={styles.infoText}>Sources: {productFood.sources}</Text>
+                    )}
+                  </View>
+                </Accordion>
+              )}
+            </View>
           </View>
-        </View>
-      )}
+        )}
 
-      {activeTab === "animal" && (
-        <View style={styles.placeholderView}>
-          <Text>Vue 3 (Mon animal)</Text>
-        </View>
-      )}
+        {activeTab === "animal" && (
+          <View style={styles.tabsContentWrapper}>
+            <Heading as="h5" style={styles.tabsHeading}>
+              Mon animal
+            </Heading>
+            <AnimalSelector />
+          </View>
+        )}
 
-      {activeTab === "community" && (
-        <View style={styles.placeholderView}>
-          <Text>Vue 4 (Avis)</Text>
-        </View>
-      )}
+        {activeTab === "community" && (
+          <View style={styles.tabsContentWrapper}>
+            <Heading as="h5" style={styles.tabsHeading}>
+              Avis
+            </Heading>
+          </View>
+        )}
+      </View>
 
+      {/* Toujours visible en bas, hors du fond coloré des tabs */}
+      <AlternativesSection productId={product.id} />
+
+      <View style={styles.optionsSection}>
+        <Heading as="h5" style={styles.optionsTitle}>Options</Heading>
+
+        <TouchableOpacity style={styles.optionItem}>
+          <View style={styles.optionLeft}>
+            <Ionicons name="trash-outline" size={20} color={Colors.light.greyscale[90]} />
+            <Text style={styles.optionText}>Supprimer de l'historique</Text>
+          </View>
+        </TouchableOpacity>
+
+        <View style={styles.optionDivider} />
+
+        <TouchableOpacity
+          style={styles.optionItem}
+          onPress={() =>
+            router.push({
+              pathname: "/(screens)/howItWorks",
+              params: { returnTo },
+            })
+          }
+        >
+          <View style={styles.optionLeft}>
+            <Text style={styles.optionText}>Méthode de notation</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={Colors.light.greyscale[90]} />
+        </TouchableOpacity>
+
+        <View style={styles.optionDivider} />
+
+        <TouchableOpacity style={styles.optionItem}>
+          <View style={styles.optionLeft}>
+            <Text style={styles.optionText}>Un problème avec ce produit</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={Colors.light.greyscale[90]} />
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 }
@@ -541,21 +562,17 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 12,
   },
-
   criteriaList: {
     gap: 14,
   },
-
   criteriaRow: {
     gap: 8,
   },
-
   criteriaLabel: {
     fontSize: 14,
     fontWeight: "600",
     color: Colors.light.greyscale[80],
   },
-
   scoreSection: {
     backgroundColor: "#fff",
     marginBottom: 16,
@@ -571,23 +588,47 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 16,
   },
-
-  placeholderView: {
-    paddingVertical: 24,
-  },
   segmentedTabs: {
     marginTop: 12,
   },
-  accordionsContainer: {
-    paddingTop: 0,
+  // Fond coloré englobant tout le contenu des tabs (fichier 1)
+  tabContentContainer: {
+    backgroundColor: Colors.light.secondary[100],
+    marginTop: -24,
+    paddingTop: 20,
+    marginBottom: 30,
+    borderRadius: 12,
+    zIndex: 0,
   },
-  ingredientsContainer: {
-    gap: 8,
+  tabsContentWrapper: {
+    marginTop: 12,
+    marginBottom: 12,
+    backgroundColor: Colors.light.secondary[100],
+    borderRadius: 16,
+    padding: 16,
+    gap: 12,
   },
-  ingredient: {
+  tabsHeading: {
+    color: Colors.light.primary.base,
+  },
+  // Liste d'ingrédients avec séparateurs (fichier 1)
+  ingredientsList: {
+    borderRadius: 12,
+    overflow: "hidden",
+    marginBottom: 16,
+  },
+  ingredientRow: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.light.greyscale[20],
+  },
+  ingredientRowLast: {
+    borderBottomWidth: 0,
+  },
+  ingredientText: {
     fontSize: 14,
-    color: "#333",
-    lineHeight: 22,
+    color: Colors.light.greyscale[80],
+    lineHeight: 20,
   },
   noData: {
     fontSize: 14,

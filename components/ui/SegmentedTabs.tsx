@@ -86,6 +86,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         paddingHorizontal: 10,
         gap: 6,
+        zIndex: 1,          // ✅ au-dessus du contenu
     },
 
     item: {

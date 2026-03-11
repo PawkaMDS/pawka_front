@@ -5,12 +5,12 @@ import type { Product, ProductScores } from "@/types/product";
 export const getOverallScore = (product?: Product | null): number | null => {
     const pf = product?.product_foods?.[0];
     
-    // Priorité 1: Utiliser total_score si disponible
-    if (pf?.total_score != null && typeof pf.total_score === "number") {
+    // Priorité 1 : total_score du ProductFood
+    if (pf?.total_score !== null && pf?.total_score !== undefined) {
         return Math.max(0, Math.min(100, Math.round(pf.total_score)));
     }
     
-    // Priorité 2: Utiliser scores.overall ou calculer depuis les scores détaillés
+    // Fallback : calcul à partir des scores détaillés
     const scores = pf?.scores as ProductScores | null | undefined;
     if (!scores) return null;
 
