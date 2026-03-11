@@ -1,5 +1,6 @@
-import { View, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, StyleSheet, Image } from "react-native";
 import { Text } from "@/components/ui/Text";
+import { Button } from "@/components/ui/Button";
 import { useRouter } from "expo-router";
 import { Colors } from "@/constants/theme";
 import { FontFamilies } from "@/constants/typography";
@@ -13,6 +14,7 @@ const premiumIcon2Source = { uri: Image.resolveAssetSource(require("@/assets/ico
 const premiumIcon3Source = { uri: Image.resolveAssetSource(require("@/assets/icons/premiumIcon-3.png")).uri };
 const premiumSubtitleIconSource = { uri: Image.resolveAssetSource(require("@/assets/icons/premiumSubtitleIcon.png")).uri };
 const premiumIcon4Source = { uri: Image.resolveAssetSource(require("@/assets/icons/premiumIcon-4.png")).uri };
+const BUTTON_ICON_SIZE = 22;
 
 const formatTrialEndDate = () => {
   const trialEndDate = new Date();
@@ -110,10 +112,17 @@ export default function PremiumConfirmedScreen() {
       </View>
 
       {/* Start Button */}
-      <TouchableOpacity style={styles.startButton} onPress={handleStart}>
-        <Text style={styles.startButtonText}>Commencer à utiliser Premium</Text>
-        <ArrowRightIcon width={20} height={20} color={Colors.light.greyscale[0]} />
-      </TouchableOpacity>
+      <Button
+        label="Commencer à utiliser Premium"
+        variant="primary"
+        onPress={handleStart}
+        textColor={Colors.light.supportBase}
+        backgroundColor={Colors.light.premiumPrimary}
+        icon={<ArrowRightIcon width={BUTTON_ICON_SIZE} height={BUTTON_ICON_SIZE} fill={Colors.light.supportBase} />}
+        iconPosition="right"
+        fullWidth
+        textStyle={styles.buttonText}
+      />
 
       {/* Footer */}
       <Text style={styles.footer}>
@@ -280,30 +289,11 @@ const styles = StyleSheet.create({
     fontFamily: FontFamilies.display.bold,
     color: Colors.light.premiumPrimary,
   },
-
-  /* BUTTON */
-  startButton: {
-    width: "100%",
-    backgroundColor: Colors.light.premiumPrimary,
-    borderRadius: 25,
-    paddingVertical: 13,
-    paddingHorizontal: 18,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    marginBottom: 16,
-    shadowColor: Colors.light.premiumPrimary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  startButtonText: {
+  buttonText: {
     fontFamily: FontFamilies.display.bold,
-    fontSize: 15,
-    color: Colors.light.greyscale[0],
+    fontSize: 16,
   },
+
   /* FOOTER */
   footer: {
     fontFamily: FontFamilies.text.regular,

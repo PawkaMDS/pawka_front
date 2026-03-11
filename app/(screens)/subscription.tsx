@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { View, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, StyleSheet, Image } from "react-native";
 import { Text } from "@/components/ui/Text";
+import { Button } from "@/components/ui/Button";
 import { useRouter } from "expo-router";
 import { Colors } from "@/constants/theme";
 import { FontFamilies } from "@/constants/typography";
@@ -13,6 +14,7 @@ const logoSource = { uri: Image.resolveAssetSource(require("@/assets/images/logo
 const premiumCheckSource = { uri: Image.resolveAssetSource(require("@/assets/icons/IconPremium.png")).uri };
 const premiumButtonSource = { uri: Image.resolveAssetSource(require("@/assets/icons/IconPremiumButton.png")).uri };
 const freeCheckSource = { uri: Image.resolveAssetSource(require("@/assets/icons/IconFreeModel.png")).uri };
+const BUTTON_ICON_SIZE = 22;
 
 export default function SubscriptionScreen() {
   const router = useRouter();
@@ -92,10 +94,17 @@ export default function SubscriptionScreen() {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.premiumButton} onPress={handlePremium}>
-          <Text style={styles.premiumButtonText}>Passer premium</Text>
-          <Image source={premiumButtonSource} style={styles.premiumButtonIcon} resizeMode="contain" />
-        </TouchableOpacity>
+        <Button
+          label="Passer premium"
+          variant="primary"
+          onPress={handlePremium}
+          textColor={Colors.light.supportBase}
+          backgroundColor={Colors.light.premiumPrimary}
+          icon={<Image source={premiumButtonSource} style={styles.buttonIcon} resizeMode="contain" />}
+          iconPosition="right"
+          fullWidth
+          textStyle={styles.buttonText}
+        />
       </View>
 
       {/* Free Card */}
@@ -121,10 +130,17 @@ export default function SubscriptionScreen() {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.freeButton} onPress={handleFreeTrial}>
-          <Text style={styles.freeButtonText}>Je teste l'application d'abord !</Text>
-          <ArrowRightIcon width={18} height={18} fill={Colors.light.greyscale[0]} />
-        </TouchableOpacity>
+        <Button
+          label="Je teste l'application d'abord !"
+          variant="simple"
+          onPress={handleFreeTrial}
+          textColor={Colors.light.supportBase}
+          backgroundColor={Colors.light.primary.base}
+          icon={<ArrowRightIcon width={BUTTON_ICON_SIZE} height={BUTTON_ICON_SIZE} fill={Colors.light.supportBase} />}
+          iconPosition="right"
+          fullWidth
+          textStyle={styles.buttonText}
+        />
       </View>
     </View>
   );
@@ -221,25 +237,15 @@ const styles = StyleSheet.create({
     flex: 1,
     lineHeight: 19,
   },
-  premiumButton: {
-    backgroundColor: Colors.light.premiumPrimary,
-    borderRadius: 25,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 8,
-  },
-  premiumButtonText: {
+  buttonText: {
     fontFamily: FontFamilies.display.bold,
     fontSize: 16,
-    color: Colors.light.greyscale[90],
   },
-  premiumButtonIcon: {
-    width: 24,
-    height: 24,
+  buttonIcon: {
+    width: BUTTON_ICON_SIZE,
+    height: BUTTON_ICON_SIZE,
   },
+
 
   /* FREE CARD */
   freeCard: {
@@ -270,19 +276,5 @@ const styles = StyleSheet.create({
     fontFamily: FontFamilies.display.bold,
     fontSize: 15,
     color: Colors.light.primary.base,
-  },
-  freeButton: {
-    backgroundColor: Colors.light.accent.base,
-    borderRadius: 25,
-    paddingVertical: 12,
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 8,
-  },
-  freeButtonText: {
-    fontFamily: FontFamilies.display.bold,
-    fontSize: 14,
-    color: Colors.light.greyscale[90],
   },
 });
