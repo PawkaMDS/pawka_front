@@ -31,8 +31,7 @@ export default function SubscriptionScreen() {
   };
 
   const handlePremium = () => {
-    // TODO: Gérer l'achat premium
-    router.replace("/(tabs)/scan/scan");
+   router.push("/(screens)/premium");
   };
 
   const handleFreeTrial = () => {
