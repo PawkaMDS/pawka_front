@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { api } from '@/lib/api/client';
-import type { Product, DetailedProduct,Alternative } from '@/types/product';
+import type { Product, DetailedProduct, Alternative, ProductFood } from '@/types/product';
 
 export interface ProductSearchResult {
   id: number;
@@ -91,3 +91,50 @@ export async function getAlternatives(productId: number): Promise<Alternative[]>
   }
 }
 
+/**
+ * Récupère le score d'analyse d'un produit pour un animal donné
+ * Si l'analyse n'existe pas, elle est créée
+ */
+export async function getAnimalProductScore(
+  animalId: number,
+  productId: number
+): Promise<ProductFood | null> {
+  try {
+    const url = `/api/animals/${animalId}/products/${productId}/score`;
+    console.log(`[API] Fetching: ${url}`);
+    const res = await api.get<{ cached: boolean; score: ProductFood; status: string }>(url);
+    console.log(`[API] Response status:`, res.status);
+    console.log(`[API] Response data:`, res.data);
+    
+    // Extraire le score de la réponse
+    const score = res.data.score;
+    
+    // Vérifier si le produit n'est pas adapté à l'animal
+    if (score.scores && typeof score.scores === 'object' && 'adapted' in score.scores) {
+      const adaptedFlag = (score.scores as any).adapted;
+      if (adaptedFlag === false) {
+        console.log(`[API] Product not adapted to animal`);
+        return null;
+      }
+    }
+    
+    return score;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status;
+      const body = err.response?.data as any;
+      console.log(`[API] Axios error - Status: ${status}`, body);
+      
+      // 404 ou 400 signifie que le produit n'est pas adapté à cet animal
+      if (status === 404 || status === 400) {
+        console.log(`[API] Product not suitable (${status})`);
+        return null;
+      }
+      if (status === 401) throw new Error('Non autorisé. Veuillez vous connecter.');
+      
+      const details = body?.message || body?.error || (typeof body === 'string' ? body : undefined) || err.message;
+      throw new Error(`API error ${status ?? 'unknown'} - ${details}`);
+    }
+    throw err as Error;
+  }
+}

@@ -383,9 +383,11 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
       {/* Fond coloré englobant tout le contenu des tabs (fichier 1) */}
       <View style={styles.tabContentContainer}>
-        {activeTab === "criteria" && (
-          <ScoreCriteriaAccordionList productFood={productFood} />
-        )}
+        <View style={styles.tabIngredientContainer}>
+          {activeTab === "criteria" && (
+            <ScoreCriteriaAccordionList productFood={productFood} />
+          )}
+        </View>
 
         {activeTab === "ingredients" && (
           <View>
@@ -438,7 +440,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             <Heading as="h5" style={styles.tabsHeading}>
               Mon animal
             </Heading>
-            <AnimalSelector />
+            <AnimalSelector productId={product.id} />
           </View>
         )}
 
@@ -598,13 +600,14 @@ const styles = StyleSheet.create({
   tabContentContainer: {
     backgroundColor: Colors.light.secondary[100],
     marginTop: -24,
-    paddingTop: 20,
     marginBottom: 30,
     borderRadius: 12,
     zIndex: 0,
   },
+  tabIngredientContainer: {
+    padding: 16,
+  },
   tabsContentWrapper: {
-    marginTop: 12,
     marginBottom: 12,
     backgroundColor: Colors.light.secondary[100],
     borderRadius: 16,

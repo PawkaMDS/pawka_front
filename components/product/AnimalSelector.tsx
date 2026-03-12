@@ -5,11 +5,16 @@ import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/theme';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { getUserAnimals } from '@/lib/api/animals';
+import { getAnimalProductScore } from '@/lib/api/products';
+import { ScoreCriteriaAccordionList } from '@/components/ui/ScoreCriteriaAccordionList';
 import type { Animal } from '@/types/animal';
+import type { ProductFood } from '@/types/product';
 import { Ionicons } from '@expo/vector-icons';
+import { ScoreCard } from '../ui/ScoreCard';
 
 interface AnimalSelectorProps {
     onAnimalSelect?: (animal: Animal | null) => void;
+    productId?: number;
 }
 
 /**
@@ -17,8 +22,9 @@ interface AnimalSelectorProps {
  * - Si non premium: affiche un message d'abonnement
  * - Si premium mais pas d'animaux: affiche un message pour ajouter un animal
  * - Si premium avec animaux: affiche une liste déroulante
+ * - Si productId est fourni: charge et affiche le score du produit pour l'animal sélectionné
  */
-export function AnimalSelector({ onAnimalSelect }: AnimalSelectorProps) {
+export function AnimalSelector({ onAnimalSelect, productId }: AnimalSelectorProps) {
     const router = useRouter();
     const { user } = useAuth();
     const [animals, setAnimals] = useState<Animal[]>([]);
@@ -26,10 +32,22 @@ export function AnimalSelector({ onAnimalSelect }: AnimalSelectorProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [productScore, setProductScore] = useState<ProductFood | null>(null);
+    const [isLoadingScore, setIsLoadingScore] = useState(false);
+    const [scoreError, setScoreError] = useState<string | null>(null);
+    const [isProductNotSuitable, setIsProductNotSuitable] = useState(false);
 
     useEffect(() => {
         loadAnimals();
     }, [user?.id]);
+
+    // Recharger le score quand productId ou selectedAnimal change
+    useEffect(() => {
+        if (selectedAnimal && productId) {
+            console.log(`[AnimalSelector] Loading score for animal ${selectedAnimal.id} and product ${productId}`);
+            loadProductScore(selectedAnimal.id, productId);
+        }
+    }, [productId, selectedAnimal?.id]);
 
     const loadAnimals = async () => {
         if (!user) return;
@@ -43,6 +61,7 @@ export function AnimalSelector({ onAnimalSelect }: AnimalSelectorProps) {
             if (userAnimals.length > 0) {
                 setSelectedAnimal(userAnimals[0]);
                 onAnimalSelect?.(userAnimals[0]);
+                // IMPORTANT: Ne pas charger le score ici, attendre le useEffect de productId
             }
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chargement des animaux';
@@ -50,6 +69,34 @@ export function AnimalSelector({ onAnimalSelect }: AnimalSelectorProps) {
             console.error('Error loading animals:', err);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const loadProductScore = async (animalId: number, pId: number) => {
+        setIsLoadingScore(true);
+        setScoreError(null);
+        setIsProductNotSuitable(false);
+        setProductScore(null);
+
+        try {
+            console.log(`[AnimalSelector] Calling getAnimalProductScore(${animalId}, ${pId})`);
+            const score = await getAnimalProductScore(animalId, pId);
+            console.log(`[AnimalSelector] Score received:`, score);
+            
+            if (score === null) {
+                // Le produit n'est pas adapté à cet animal
+                console.log(`[AnimalSelector] Product not suitable for animal ${animalId}`);
+                setIsProductNotSuitable(true);
+            } else {
+                console.log(`[AnimalSelector] Setting product score`);
+                setProductScore(score);
+            }
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chargement du score';
+            console.error(`[AnimalSelector] Error loading product score:`, err);
+            setScoreError(errorMessage);
+        } finally {
+            setIsLoadingScore(false);
         }
     };
 
@@ -132,6 +179,46 @@ export function AnimalSelector({ onAnimalSelect }: AnimalSelectorProps) {
                 />
             </TouchableOpacity>
 
+            {/* Affichage du score du produit si productId est fourni */}
+            {productId && (
+                <>
+                    {isLoadingScore && (
+                        <View style={styles.scoreContainer}>
+                            <ActivityIndicator size="small" color={Colors.light.primary.base} />
+                        </View>
+                    )}
+
+                    {scoreError && !isLoadingScore && (
+                        <View style={styles.scoreErrorBox}>
+                            <Text style={styles.scoreErrorText}>{scoreError}</Text>
+                        </View>
+                    )}
+
+                    {isProductNotSuitable && !isLoadingScore && (
+                        <View style={styles.notSuitableBox}>
+                            <Ionicons
+                                name="alert-circle"
+                                size={20}
+                                color={Colors.light.negativePrimary}
+                            />
+                            <Text style={styles.notSuitableText}>
+                                Ce produit n'est pas adapté à {selectedAnimal?.name}
+                            </Text>
+                        </View>
+                    )}
+
+                    {productScore && !isLoadingScore && !isProductNotSuitable && (
+                        <View style={styles.scoreSection}>
+                            {/* Affichage du score total */}
+                            {productScore.total_score !== null && productScore.total_score !== undefined && (
+                                <ScoreCard score={productScore.total_score} variant="large" />
+                            )}
+                            <ScoreCriteriaAccordionList productFood={productScore} />
+                        </View>
+                    )}
+                </>
+            )}
+
             <Modal
                 visible={isModalOpen}
                 transparent
@@ -162,6 +249,10 @@ export function AnimalSelector({ onAnimalSelect }: AnimalSelectorProps) {
                                     onPress={() => {
                                         setSelectedAnimal(animal);
                                         onAnimalSelect?.(animal);
+                                        // Charger le score si productId est disponible
+                                        if (productId) {
+                                            loadProductScore(animal.id, productId);
+                                        }
                                         setIsModalOpen(false);
                                     }}
                                 >
@@ -278,6 +369,63 @@ const styles = StyleSheet.create({
         color: Colors.light.primary.base,
         fontWeight: '500',
         flex: 1,
+    },
+    scoreContainer: {
+        paddingVertical: 16,
+        alignItems: 'center',
+    },
+    scoreErrorBox: {
+        backgroundColor: Colors.light.negativeTertiary,
+        borderRadius: 8,
+        padding: 12,
+        marginBottom: 12,
+        borderLeftWidth: 4,
+        borderLeftColor: Colors.light.negativePrimary,
+    },
+    scoreErrorText: {
+        color: Colors.light.negativeText,
+        fontSize: 13,
+        lineHeight: 18,
+    },
+    notSuitableBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: Colors.light.negativeTertiary,
+        borderRadius: 8,
+        padding: 12,
+        marginBottom: 12,
+        borderLeftWidth: 4,
+        borderLeftColor: Colors.light.negativePrimary,
+        gap: 10,
+    },
+    notSuitableText: {
+        color: Colors.light.negativeText,
+        fontSize: 13,
+        lineHeight: 18,
+        flex: 1,
+    },
+    scoreSection: {
+        marginBottom: 12,
+    },
+    totalScoreBox: {
+        backgroundColor: Colors.light.secondary[100],
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 16,
+        alignItems: 'center',
+        borderLeftWidth: 4,
+        borderLeftColor: Colors.light.primary.base,
+    },
+    totalScoreLabel: {
+        fontSize: 14,
+        color: Colors.light.greyscale[60],
+        fontWeight: '500',
+        marginBottom: 8,
+    },
+    totalScoreValue: {
+        fontSize: 28,
+        fontWeight: '700',
+        color: Colors.light.primary.base,
     },
     modalOverlay: {
         flex: 1,

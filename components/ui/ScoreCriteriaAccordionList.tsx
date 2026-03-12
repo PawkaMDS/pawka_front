@@ -147,10 +147,9 @@ export function ScoreCriteriaAccordionList({ productFood }: Props) {
 
 const styles = StyleSheet.create({
     wrapper: {
-        marginTop: 12,
+        marginTop: 32,
         backgroundColor: Colors.light.secondary[100],
         borderRadius: 16,
-        padding: 16,
         gap: 12,
     },
 
