@@ -211,7 +211,7 @@ export function AnimalSelector({ onAnimalSelect, productId }: AnimalSelectorProp
                         <View style={styles.scoreSection}>
                             {/* Affichage du score total */}
                             {productScore.total_score !== null && productScore.total_score !== undefined && (
-                                <ScoreCard score={productScore.total_score} variant="large" />
+                                <ScoreCard score={productScore.total_score} variant="medium" />
                             )}
                             <ScoreCriteriaAccordionList productFood={productScore} />
                         </View>

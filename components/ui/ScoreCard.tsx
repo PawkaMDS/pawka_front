@@ -6,7 +6,7 @@ import { Heading } from "./Heading";
 
 type Props = {
     score: number; // 0..100
-    variant?: "mini" | "large";
+    variant?: "mini" | "large" | "medium";
 };
 
 export function ScoreCard({ score, variant = "mini" }: Props) {
@@ -17,6 +17,14 @@ export function ScoreCard({ score, variant = "mini" }: Props) {
         return (
             <View style={[styles.miniPill, { backgroundColor: bg }]}>
                 <Heading as="h6" style={styles.miniText}>{s} /100</Heading>
+            </View>
+        );
+    }
+
+    if (variant === "medium") {
+        return (
+            <View style={[styles.mediumCard, { backgroundColor: bg }]}>
+                <Heading as="h6" style={styles.mediumScore}>{s} /100</Heading>
             </View>
         );
     }
@@ -78,5 +86,18 @@ const styles = StyleSheet.create({
         marginTop: 5,
         fontSize: 18,
         color: Colors.light.greyscale[0],
+    },
+    // ===== MEDIUM CARD =====
+    mediumCard: {
+        borderRadius: 12,
+        paddingVertical: 16,
+        paddingHorizontal: 12,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    mediumScore: {
+        color: Colors.light.greyscale[0],
+        fontSize: 24,
+        fontWeight: "bold",
     },
 });
