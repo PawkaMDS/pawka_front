@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ActivityIndicator, Modal, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Text } from '@/components/ui/Text';
+import { Button } from '@/components/ui/Button';
 import { Colors } from '@/constants/theme';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { getUserAnimals } from '@/lib/api/animals';
@@ -12,6 +13,7 @@ import type { Animal } from '@/types/animal';
 import type { ProductFood } from '@/types/product';
 import { Ionicons } from '@expo/vector-icons';
 import { ScoreCard } from '../ui/ScoreCard';
+import IconPaw from '@/assets/icons/paw.svg';
 
 interface AnimalSelectorProps {
     onAnimalSelect?: (animal: Animal | null) => void;
@@ -118,12 +120,15 @@ export function AnimalSelector({ onAnimalSelect, productId }: AnimalSelectorProp
                         Abonnez vous pour avoir un score personnalisé pour votre animal
                     </Text>
                 </View>
-                <TouchableOpacity
-                    style={styles.subscribeButton}
+                <Button
+                    label="M'abonner"
+                    variant="primary"
+                    fullWidth
                     onPress={() => router.push('/(screens)/subscription')}
-                >
-                    <Text style={styles.subscribeButtonText}>M'abonner</Text>
-                </TouchableOpacity>
+                    disabled={isLoading}
+                    containerStyle={{ marginTop: 12 }}
+                    icon={<IconPaw height={20} width={20} fill={Colors.light.secondary.base} />}
+                />
             </View>
         );
     }
