@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth/AuthContext';
 import { getUserAnimals } from '@/lib/api/animals';
 import { getAnimalProductScore } from '@/lib/api/products';
 import { ScoreCriteriaAccordionList } from '@/components/ui/ScoreCriteriaAccordionList';
+import { formatAnimalAge } from '@/utils/animals';
 import type { Animal } from '@/types/animal';
 import type { ProductFood } from '@/types/product';
 import { Ionicons } from '@expo/vector-icons';
@@ -121,7 +122,7 @@ export function AnimalSelector({ onAnimalSelect, productId }: AnimalSelectorProp
                     style={styles.subscribeButton}
                     onPress={() => router.push('/(screens)/subscription')}
                 >
-                    <Text style={styles.subscribeButtonText}>S'abonner</Text>
+                    <Text style={styles.subscribeButtonText}>M'abonner</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -170,6 +171,7 @@ export function AnimalSelector({ onAnimalSelect, productId }: AnimalSelectorProp
                     </View>
                     <Text style={styles.selectButtonText}>
                         {selectedAnimal?.name || 'Sélectionnez un animal'}
+                        {selectedAnimal?.birth_date && ` • ${formatAnimalAge(selectedAnimal.birth_date)}`}
                     </Text>
                 </View>
                 <Ionicons
@@ -279,11 +281,18 @@ export function AnimalSelector({ onAnimalSelect, productId }: AnimalSelectorProp
                                         >
                                             {animal.name}
                                         </Text>
-                                        {animal.type && (
-                                            <Text style={styles.animalItemSubtext}>
-                                                {animal.type.name}
-                                            </Text>
-                                        )}
+                                        <View style={styles.animalItemMetaRow}>
+                                            {animal.type && (
+                                                <Text style={styles.animalItemSubtext}>
+                                                    {animal.type.name}
+                                                </Text>
+                                            )}
+                                            {animal.birth_date && (
+                                                <Text style={styles.animalItemSubtext}>
+                                                    • {formatAnimalAge(animal.birth_date)}
+                                                </Text>
+                                            )}
+                                        </View>
                                     </View>
                                     {selectedAnimal?.id === animal.id && (
                                         <Ionicons
@@ -485,6 +494,13 @@ const styles = StyleSheet.create({
     animalItemContent: {
         flex: 1,
     },
+    animalItemMetaRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        marginTop: 4,
+        flexWrap: 'wrap',
+    },
     animalItemText: {
         fontSize: 14,
         fontWeight: '500',
@@ -497,7 +513,6 @@ const styles = StyleSheet.create({
     animalItemSubtext: {
         fontSize: 12,
         color: Colors.light.greyscale[60],
-        marginTop: 4,
     },
     subscribeButton: {
         backgroundColor: Colors.light.primary.base,
