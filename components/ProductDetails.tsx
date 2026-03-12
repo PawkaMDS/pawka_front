@@ -445,8 +445,11 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         {activeTab === "community" && (
           <View style={styles.tabsContentWrapper}>
             <Heading as="h5" style={styles.tabsHeading}>
-              Avis
+              Bientôt disponible
             </Heading>
+            <Text>
+              Super que la communauté t'intéresse ! Elle sera disponible très prochainement. Reste à l'affût des actualités de Pawka pour ne rien manquer !
+            </Text>
           </View>
         )}
       </View>
