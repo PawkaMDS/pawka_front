@@ -156,15 +156,15 @@ export default function OnboardingScreen() {
           <Text style={styles.panelDescription}>{FIXED_DESCRIPTION}</Text>
           
           <Button
-          textColor={Colors.light.supportBase}
-          label="Commencer maintenant"
-          variant="primary"
-          fullWidth
-          icon={<ArrowRightIcon width={20} height={20} fill={Colors.light.supportBase} />}
-          iconPosition="right"
-          containerStyle={{ margin: 20 }} 
-          onPress={handleStart}
-        />
+            textColor={Colors.light.supportBase}
+            label="Commencer maintenant"
+            variant="primary"
+            fullWidth
+            icon={<ArrowRightIcon width={20} height={20} fill={Colors.light.supportBase} />}
+            iconPosition="right"
+            containerStyle={{ margin: 20 }} 
+            onPress={handleStart}
+          />
         </View>
       </View>
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
