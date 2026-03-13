@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, FlatList, Image, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from "@/components/ui/Text";
 import { Heading } from '@/components/ui/Heading';
 import { getSearchHistory, SearchHistoryItem } from '@/lib/api/searchHistory';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import PageLayout from '@/components/layout/PageLayout';
 import { Colors } from '@/constants/theme';
 import { ScoreCard } from "@/components/ui/ScoreCard";
@@ -28,20 +28,24 @@ export default function History() {
     });
   };
 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const data = await getSearchHistory();
-        if (mounted) setItems(data);
-      } catch (err: any) {
-        if (mounted) setError(err?.message || 'Erreur lors de la récupération');
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
-    return () => { mounted = false; };
+  const loadHistory = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await getSearchHistory();
+      setItems(data);
+      setError(null);
+    } catch (err: any) {
+      setError(err?.message || 'Erreur lors de la récupération');
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadHistory();
+    }, [loadHistory])
+  );
 
   if (loading) {
     return (
