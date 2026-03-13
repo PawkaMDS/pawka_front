@@ -20,12 +20,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "usesCleartextTraffic": true,
-      "permissions": [
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO"
-      ],
-      "package": "com.doriantrd.pawka_front"
+      "usesCleartextTraffic": true
     },
     "web": {
       "output": "static",
@@ -57,12 +52,6 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    },
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "d9b1d736-8719-434d-a5d4-be27aeb7cb06"
-      }
     }
   }
 }
