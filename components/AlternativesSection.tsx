@@ -6,6 +6,7 @@ import { getAlternatives } from "@/lib/api/products";
 import type { Alternative } from "@/types/product";
 import { Colors } from "@/constants/theme";
 import { useRouter } from "expo-router";
+import { Heading } from "./ui/Heading";
 
 interface AlternativesSectionProps {
   productId: number;
@@ -56,7 +57,9 @@ export function AlternativesSection({ productId }: AlternativesSectionProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Alternatives plus saines</Text>
+      <Heading style={styles.title} as="h4">
+        Alternatives plus saines
+      </Heading>
       {alternatives.length === 0 ? (
         <Text style={styles.noAlternativesText}>Aucune alternative disponible pour ce produit</Text>
       ) : (
@@ -84,15 +87,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
   },
   title: {
-    fontSize: 16,
-    fontWeight: "700",
     color: Colors.light.primary.base,
     marginBottom: 12,
-    paddingHorizontal: 16,
   },
   scrollContent: {
-    paddingHorizontal: 8,
-    paddingRight: 8,
   },
   loadingContainer: {
     height: 200,
@@ -103,7 +101,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.light.greyscale[60],
     fontStyle: "italic",
-    paddingHorizontal: 16,
     paddingVertical: 12,
   },
 });

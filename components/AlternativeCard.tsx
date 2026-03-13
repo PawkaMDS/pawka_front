@@ -60,7 +60,7 @@ export function AlternativeCard({ alternative, onPress }: AlternativeCardProps) 
 const styles = StyleSheet.create({
   container: {
     width: 160,
-    marginHorizontal: 8,
+    marginRight: 16,
   },
   scoreBadge: {
     position: "absolute",
