@@ -12,10 +12,12 @@ import {
 } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
+import { useIsFocused } from "@react-navigation/native";
 import { scanProductByEAN } from "@/lib/api/scan";
 import { Colors } from "@/constants/theme";
 
 export default function Scan() {
+  const isFocused = useIsFocused();
   const [permission, requestPermission] = useCameraPermissions();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -103,14 +105,17 @@ export default function Scan() {
   return (
     <View style={styles.container}>
       <View style={styles.cameraContainer}>
-        <CameraView
-          style={StyleSheet.absoluteFill}
-          facing="back"
-          barcodeScannerSettings={{
-            barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"],
-          }}
-          onBarcodeScanned={isLoading ? undefined : onBarcodeScanned}
-        />
+
+        {isFocused && (
+          <CameraView
+            style={StyleSheet.absoluteFill}
+            facing="back"
+            barcodeScannerSettings={{
+              barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"],
+            }}
+            onBarcodeScanned={isLoading ? undefined : onBarcodeScanned}
+          />
+        )}
 
         <View style={styles.overlay} pointerEvents="none">
           <View style={styles.scanFrame}>
@@ -135,6 +140,7 @@ export default function Scan() {
             </TouchableOpacity>
           </View>
         )}
+
       </View>
     </View>
   );
@@ -156,7 +162,7 @@ const styles = StyleSheet.create({
   },
   scanFrame: {
     width: "80%",
-    aspectRatio: 1.5, // Rectangle plus large que haut (adapté aux codes-barres)
+    aspectRatio: 1.5,
     position: "relative",
   },
   corner: {
