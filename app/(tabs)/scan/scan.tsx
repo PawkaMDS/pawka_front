@@ -13,6 +13,7 @@ import {
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { scanProductByEAN } from "@/lib/api/scan";
+import { Colors } from "@/constants/theme";
 
 export default function Scan() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -247,7 +248,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   button: {
-    backgroundColor: "#0A7EA4",
+    backgroundColor: Colors.light.primary.base,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 10,
