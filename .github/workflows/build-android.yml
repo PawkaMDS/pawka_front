@@ -35,7 +35,7 @@ jobs:
 
       - name: Create .env
         run: |
-          echo "EXPO_PUBLIC_API_URL=http://s44so40g44soo0oosoc8k048.37.59.98.93.sslip.io" > .env
+          echo "EXPO_PUBLIC_API_URL=https://api.mathyscunsolo.fr/" > .env
           cat .env
 
       - name: Decode Keystore
