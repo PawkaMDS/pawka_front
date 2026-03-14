@@ -22,6 +22,7 @@ export default function TabsLayout() {
         name="scan/scan"
         options={{
           title: "Scan",
+          unmountOnBlur: true,
           tabBarIcon: ({ color }) => (
             <ScanIcon width={22} height={22} fill={color} />
           ),
