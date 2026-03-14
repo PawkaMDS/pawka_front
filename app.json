@@ -4,21 +4,19 @@
     "slug": "pawka_front",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo.png",
+    "icon": "./assets/images/LogoAndroid.png",
     "scheme": "pawkafront",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#FFFDDCFF",
-        "foregroundImage": "./assets/images/logo.png"
-        // "backgroundImage": "./assets/images/android-icon-background.png",
-        // "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/LogoAndroid.png"
       },
-      "edgeToEdgeEnabled": true,
+      "edgeToEdgeEnabled": false,
       "predictiveBackGestureEnabled": false,
       "usesCleartextTraffic": true,
       "permissions": [
@@ -61,7 +59,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "cbb53016-906b-4d08-8848-a1251422fced"
+        "projectId": "d9b1d736-8719-434d-a5d4-be27aeb7cb06"
       }
     }
   }
