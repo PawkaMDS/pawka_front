@@ -34,7 +34,6 @@ export default function Scan() {
     const code = scan.data?.trim();
     const type = scan.type?.toLowerCase?.() ?? "";
 
-    // Accepter EAN-13, EAN-8, UPC-A et UPC-E
     const isValidBarcode =
       type.includes("ean13") ||
       type.includes("ean-13") ||
@@ -47,7 +46,6 @@ export default function Scan() {
 
     if (!code || !isValidBarcode) return;
 
-    // Empêcher de rescanner le même code
     if (lastScannedCodeRef.current === code) return;
 
     lastScannedCodeRef.current = code;
@@ -66,7 +64,6 @@ export default function Scan() {
           pathname: "/(tabs)/scan/_result",
           params: { productId: String(result.id) },
         });
-        // Reset pour permettre un nouveau scan au retour
         lastScannedCodeRef.current = null;
       } else {
         setError(
@@ -106,39 +103,44 @@ export default function Scan() {
     <View style={styles.container}>
       <View style={styles.cameraContainer}>
 
+        <CameraView
+          style={[
+            styles.camera,
+            { zIndex: isFocused ? 1 : -1 }, // 👈 Cache derrière tout quand pas focus
+          ]}
+          facing="back"
+          barcodeScannerSettings={{
+            barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"],
+          }}
+          onBarcodeScanned={isLoading || !isFocused ? undefined : onBarcodeScanned}
+        />
+
         {isFocused && (
-          <CameraView
-            style={StyleSheet.absoluteFill}
-            facing="back"
-            barcodeScannerSettings={{
-              barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"],
-            }}
-            onBarcodeScanned={isLoading ? undefined : onBarcodeScanned}
-          />
-        )}
+          <>
+            <View style={styles.overlay} pointerEvents="none">
+              <View style={styles.scanFrame}>
+                <View style={[styles.corner, styles.cornerTopLeft]} />
+                <View style={[styles.corner, styles.cornerTopRight]} />
+                <View style={[styles.corner, styles.cornerBottomLeft]} />
+                <View style={[styles.corner, styles.cornerBottomRight]} />
+              </View>
+            </View>
 
-        <View style={styles.overlay} pointerEvents="none">
-          <View style={styles.scanFrame}>
-            <View style={[styles.corner, styles.cornerTopLeft]} />
-            <View style={[styles.corner, styles.cornerTopRight]} />
-            <View style={[styles.corner, styles.cornerBottomLeft]} />
-            <View style={[styles.corner, styles.cornerBottomRight]} />
-          </View>
-        </View>
+            {!error && !isLoading && (
+              <View style={styles.hintContainer}>
+                <Text style={styles.hint}>Scannez le code-barres d'un produit</Text>
+              </View>
+            )}
 
-        {!error && !isLoading && (
-          <View style={styles.hintContainer}>
-            <Text style={styles.hint}>Scannez le code-barres d'un produit</Text>
-          </View>
-        )}
-
-        {error && !isLoading && (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{error}</Text>
-            <TouchableOpacity style={styles.retryButton} onPress={reset}>
-              <Text style={styles.retryButtonText}>Réessayer</Text>
-            </TouchableOpacity>
-          </View>
+            {error && !isLoading && (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{error}</Text>
+                <TouchableOpacity style={styles.retryButton} onPress={reset}>
+                  <Text style={styles.retryButtonText}>Réessayer</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </>
         )}
 
       </View>
@@ -149,16 +151,24 @@ export default function Scan() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "transparent",
   },
   cameraContainer: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "transparent",
+  },
+  camera: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "center",
+    zIndex: 2,
   },
   scanFrame: {
     width: "80%",
@@ -203,6 +213,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.7)",
     padding: 16,
     borderRadius: 12,
+    zIndex: 2,
   },
   hint: {
     textAlign: "center",
@@ -218,6 +229,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
+    zIndex: 2,
   },
   errorText: {
     color: "#fff",
